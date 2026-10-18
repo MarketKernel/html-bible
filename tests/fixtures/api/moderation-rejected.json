@@ -1,0 +1,30 @@
+{
+  "name": "moderation-rejected",
+  "description": "Moderation refusal (stub: the text contains __reject__): 422 with the reason in the author's language; nothing saved.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/verses/01JAS000000000000000000V01/interpretations",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "lang": "ru",
+          "side": "pro",
+          "bodyMd": "__reject__"
+        }
+      },
+      "response": {
+        "status": 422,
+        "body": {
+          "error": {
+            "code": "moderation_rejected",
+            "message": "Текст отклонён модерацией (тестовое слово __reject__).",
+            "reason": "Текст отклонён модерацией (тестовое слово __reject__)."
+          }
+        }
+      }
+    }
+  ]
+}

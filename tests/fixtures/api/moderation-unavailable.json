@@ -1,0 +1,28 @@
+{
+  "name": "moderation-unavailable",
+  "description": "Moderator down (stub: __unavailable__): 503, nothing saved; keep the form text and retry.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/questions",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "lang": "en",
+          "title": "__unavailable__"
+        }
+      },
+      "response": {
+        "status": 503,
+        "body": {
+          "error": {
+            "code": "moderation_unavailable",
+            "message": "Moderation is unavailable; nothing was saved. Try again later."
+          }
+        }
+      }
+    }
+  ]
+}

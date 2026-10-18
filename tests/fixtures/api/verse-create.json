@@ -1,0 +1,166 @@
+{
+  "name": "verse-create",
+  "description": "Add a verse (a \"stone\") to a subtopic, then read its rating: with eval-delay 0 it is already evaluated (no interpretations yet → both models say 0, low confidence).",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/arguments/01JAS000000000000000000A01/verses",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "ref": {
+            "from": "JHN.5.19",
+            "to": "JHN.5.20"
+          }
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "id": "<ulid>",
+          "argumentId": "01JAS000000000000000000A01",
+          "questionId": "01JAS000000000000000000Q01",
+          "ref": {
+            "from": "JHN.5.19",
+            "to": "JHN.5.20"
+          },
+          "author": {
+            "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
+            "displayName": "Elena"
+          },
+          "createdAt": "<iso8601>",
+          "votes": {
+            "pro": 0,
+            "con": 0,
+            "none": 0,
+            "mine": null
+          },
+          "users": {
+            "outcome": null
+          },
+          "ai": {
+            "outcome": 0,
+            "status": "fresh",
+            "verdicts": [
+              {
+                "verseId": "<ulid>",
+                "model": "openai-stub-mini",
+                "value": 0,
+                "confidence": 0.3,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-mini** (заглушка) прочла толкований за «Соответствует»: 0 (0 знаков), за «Не соответствует»: 0 (0 знаков): толкований пока нет, поэтому стих пока считается не относящимся к теме.",
+                  "en": "**openai-stub-mini** (stub) read 0 interpretation(s) for “Consistent” (0 characters) and 0 for “Not consistent” (0 characters): nobody has explained the verse yet, so it counts as not relevant for now."
+                },
+                "inputHash": "<sha256>",
+                "createdAt": "<iso8601>"
+              },
+              {
+                "verseId": "<ulid>",
+                "model": "openai-stub-large",
+                "value": 0,
+                "confidence": 0.3,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-large** (заглушка) прочла толкований за «Соответствует»: 0 (0 знаков), за «Не соответствует»: 0 (0 знаков): толкований пока нет, поэтому стих пока считается не относящимся к теме.",
+                  "en": "**openai-stub-large** (stub) read 0 interpretation(s) for “Consistent” (0 characters) and 0 for “Not consistent” (0 characters): nobody has explained the verse yet, so it counts as not relevant for now."
+                },
+                "inputHash": "<sha256>",
+                "createdAt": "<iso8601>"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/verses/01JAS000000000000000000V01/rating"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "votes": {
+            "pro": 3,
+            "con": 1,
+            "none": 0
+          },
+          "users": {
+            "outcome": 1
+          },
+          "ai": {
+            "outcome": 1,
+            "status": "fresh",
+            "verdicts": [
+              {
+                "verseId": "01JAS000000000000000000V01",
+                "model": "openai-stub-mini",
+                "value": 1,
+                "confidence": 0.6,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-mini** (заглушка) прочла толкований за «Соответствует»: 2 (369 знаков), за «Не соответствует»: 1 (176 знаков): стих подтверждает позицию «Соответствует».",
+                  "en": "**openai-stub-mini** (stub) read 2 interpretation(s) for “Consistent” (369 characters) and 1 for “Not consistent” (176 characters): the verse supports “Consistent”."
+                },
+                "inputHash": "74cbfb1e03dfa1be6883816bfe008c9db6b18f3844458ea63ee9eb3dd4cef712",
+                "createdAt": "2026-10-01T09:00:00.000Z"
+              },
+              {
+                "verseId": "01JAS000000000000000000V01",
+                "model": "openai-stub-large",
+                "value": 1,
+                "confidence": 0.8,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-large** (заглушка) прочла толкований за «Соответствует»: 2 (369 знаков), за «Не соответствует»: 1 (176 знаков): стих подтверждает позицию «Соответствует».",
+                  "en": "**openai-stub-large** (stub) read 2 interpretation(s) for “Consistent” (369 characters) and 1 for “Not consistent” (176 characters): the verse supports “Consistent”."
+                },
+                "inputHash": "74cbfb1e03dfa1be6883816bfe008c9db6b18f3844458ea63ee9eb3dd4cef712",
+                "createdAt": "2026-10-01T09:00:00.000Z"
+              }
+            ]
+          },
+          "argument": {
+            "id": "01JAS000000000000000000A01",
+            "tally": {
+              "users": {
+                "pro": 4,
+                "con": 2,
+                "none": 0,
+                "open": 2
+              },
+              "ai": {
+                "pro": 2,
+                "con": 1,
+                "none": 4,
+                "open": 1
+              },
+              "aiStatus": "fresh"
+            }
+          },
+          "question": {
+            "id": "01JAS000000000000000000Q01",
+            "tally": {
+              "users": {
+                "pro": 7,
+                "con": 6,
+                "none": 1,
+                "open": 4
+              },
+              "ai": {
+                "pro": 3,
+                "con": 2,
+                "none": 11,
+                "open": 2
+              },
+              "aiStatus": "fresh"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

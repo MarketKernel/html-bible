@@ -1,0 +1,28 @@
+{
+  "name": "question-create-no-lang",
+  "description": "\"lang\" is required whenever text is sent.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/questions",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "title": "Hello"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"lang\" must be \"ru\" or \"en\"",
+            "field": "lang"
+          }
+        }
+      }
+    }
+  ]
+}

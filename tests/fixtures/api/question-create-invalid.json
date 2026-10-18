@@ -1,0 +1,29 @@
+{
+  "name": "question-create-invalid",
+  "description": "Validation errors name the field.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/questions",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "lang": "en",
+          "title": "   "
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"title\" must be 1–200 characters",
+            "field": "title"
+          }
+        }
+      }
+    }
+  ]
+}

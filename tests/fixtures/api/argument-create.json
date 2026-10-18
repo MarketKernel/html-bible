@@ -1,0 +1,57 @@
+{
+  "name": "argument-create",
+  "description": "Add a subtopic. Without verses its tally is all zeros and aiStatus \"none\".",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/questions/01JAS000000000000000000Q01/arguments",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "lang": "ru",
+          "title": "Свидетельство ранней Церкви",
+          "summaryMd": "Что говорят тексты о вере первых христиан?"
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "id": "<ulid>",
+          "questionId": "01JAS000000000000000000Q01",
+          "title": {
+            "orig": "ru",
+            "ru": "Свидетельство ранней Церкви",
+            "en": "[auto-translated ru→en] Свидетельство ранней Церкви"
+          },
+          "summaryMd": {
+            "orig": "ru",
+            "ru": "Что говорят тексты о вере первых христиан?",
+            "en": "[auto-translated ru→en] Что говорят тексты о вере первых христиан?"
+          },
+          "author": {
+            "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
+            "displayName": "Elena"
+          },
+          "createdAt": "<iso8601>",
+          "tally": {
+            "users": {
+              "pro": 0,
+              "con": 0,
+              "none": 0,
+              "open": 0
+            },
+            "ai": {
+              "pro": 0,
+              "con": 0,
+              "none": 0,
+              "open": 0
+            },
+            "aiStatus": "none"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "name": "interpretation-create",
+  "description": "Write an interpretation in one column (here: a reply to the other side), then read the verse's rating: re-evaluated with it (eval-delay 0).",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/verses/01JAS000000000000000000V02/interpretations",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "lang": "ru",
+          "side": "pro",
+          "replyTo": "01JAS000000000000000000T05",
+          "bodyMd": "В Ин 17 ученики едины с Отцом и Сыном *через* них, а в Ин 10:30 Сын говорит о Себе и Отце."
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "id": "<ulid>",
+          "verseId": "01JAS000000000000000000V02",
+          "argumentId": "01JAS000000000000000000A01",
+          "questionId": "01JAS000000000000000000Q01",
+          "side": "pro",
+          "bodyMd": {
+            "orig": "ru",
+            "ru": "В Ин 17 ученики едины с Отцом и Сыном *через* них, а в Ин 10:30 Сын говорит о Себе и Отце.",
+            "en": "[auto-translated ru→en] В Ин 17 ученики едины с Отцом и Сыном *через* них, а в Ин 10:30 Сын говорит о Себе и Отце."
+          },
+          "replyTo": "01JAS000000000000000000T05",
+          "author": {
+            "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
+            "displayName": "Elena"
+          },
+          "createdAt": "<iso8601>",
+          "votes": {
+            "up": 0,
+            "down": 0,
+            "mine": null
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/verses/01JAS000000000000000000V02/rating"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "votes": {
+            "pro": 2,
+            "con": 2,
+            "none": 0
+          },
+          "users": {
+            "outcome": null
+          },
+          "ai": {
+            "outcome": 1,
+            "status": "fresh",
+            "verdicts": [
+              {
+                "verseId": "01JAS000000000000000000V02",
+                "model": "openai-stub-mini",
+                "value": 1,
+                "confidence": 0.6,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-mini** (заглушка) прочла толкований за «Соответствует»: 2 (246 знаков), за «Не соответствует»: 1 (164 знаков): стих подтверждает позицию «Соответствует».",
+                  "en": "**openai-stub-mini** (stub) read 2 interpretation(s) for “Consistent” (246 characters) and 1 for “Not consistent” (164 characters): the verse supports “Consistent”."
+                },
+                "inputHash": "<sha256>",
+                "createdAt": "<iso8601>"
+              },
+              {
+                "verseId": "01JAS000000000000000000V02",
+                "model": "openai-stub-large",
+                "value": 1,
+                "confidence": 0.8,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-large** (заглушка) прочла толкований за «Соответствует»: 2 (246 знаков), за «Не соответствует»: 1 (164 знаков): стих подтверждает позицию «Соответствует».",
+                  "en": "**openai-stub-large** (stub) read 2 interpretation(s) for “Consistent” (246 characters) and 1 for “Not consistent” (164 characters): the verse supports “Consistent”."
+                },
+                "inputHash": "<sha256>",
+                "createdAt": "<iso8601>"
+              }
+            ]
+          },
+          "argument": {
+            "id": "01JAS000000000000000000A01",
+            "tally": {
+              "users": {
+                "pro": 4,
+                "con": 2,
+                "none": 0,
+                "open": 1
+              },
+              "ai": {
+                "pro": 3,
+                "con": 1,
+                "none": 2,
+                "open": 1
+              },
+              "aiStatus": "fresh"
+            }
+          },
+          "question": {
+            "id": "01JAS000000000000000000Q01",
+            "tally": {
+              "users": {
+                "pro": 7,
+                "con": 6,
+                "none": 1,
+                "open": 3
+              },
+              "ai": {
+                "pro": 4,
+                "con": 2,
+                "none": 9,
+                "open": 2
+              },
+              "aiStatus": "fresh"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

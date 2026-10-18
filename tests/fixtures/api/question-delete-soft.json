@@ -1,0 +1,22 @@
+{
+  "name": "question-delete-soft",
+  "description": "Deleting a topic that has subtopics keeps it, marked deleted, with its texts emptied.",
+  "steps": [
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/v1/questions/01JAS000000000000000000Q01",
+        "headers": {
+          "Authorization": "Bearer <jwt:anna>"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "01JAS000000000000000000Q01",
+          "deleted": "soft"
+        }
+      }
+    }
+  ]
+}

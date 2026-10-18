@@ -1,0 +1,22 @@
+{
+  "name": "interpretation-delete-soft",
+  "description": "An interpretation that has replies is kept as \"deleted by author\" (text emptied).",
+  "steps": [
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/v1/interpretations/01JAS000000000000000000T02",
+        "headers": {
+          "Authorization": "Bearer <jwt:david>"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "01JAS000000000000000000T02",
+          "deleted": "soft"
+        }
+      }
+    }
+  ]
+}

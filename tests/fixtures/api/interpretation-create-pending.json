@@ -1,0 +1,135 @@
+{
+  "name": "interpretation-create-pending",
+  "description": "With --eval-delay the verse turns \"pending\" (the old verdicts and outcome still shown) until the evaluation finishes.",
+  "server": {
+    "evalDelay": 30
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/verses/01JAS000000000000000000V06/interpretations",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "lang": "en",
+          "side": "con",
+          "bodyMd": "Acts 1:7 repeats it after the resurrection: the times are in the Father's own authority."
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "id": "<ulid>",
+          "verseId": "01JAS000000000000000000V06",
+          "argumentId": "01JAS000000000000000000A01",
+          "questionId": "01JAS000000000000000000Q01",
+          "side": "con",
+          "bodyMd": {
+            "orig": "en",
+            "ru": "[auto-translated en→ru] Acts 1:7 repeats it after the resurrection: the times are in the Father's own authority.",
+            "en": "Acts 1:7 repeats it after the resurrection: the times are in the Father's own authority."
+          },
+          "author": {
+            "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
+            "displayName": "Elena"
+          },
+          "createdAt": "<iso8601>",
+          "votes": {
+            "up": 0,
+            "down": 0,
+            "mine": null
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/verses/01JAS000000000000000000V06/rating"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "votes": {
+            "pro": 1,
+            "con": 3,
+            "none": 0
+          },
+          "users": {
+            "outcome": -1
+          },
+          "ai": {
+            "outcome": 1,
+            "status": "pending",
+            "verdicts": [
+              {
+                "verseId": "01JAS000000000000000000V06",
+                "model": "openai-stub-mini",
+                "value": 1,
+                "confidence": 0.6,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-mini** (заглушка) прочла толкований за «Соответствует»: 1 (233 знаков), за «Не соответствует»: 1 (129 знаков): стих подтверждает позицию «Соответствует».",
+                  "en": "**openai-stub-mini** (stub) read 1 interpretation(s) for “Consistent” (233 characters) and 1 for “Not consistent” (129 characters): the verse supports “Consistent”."
+                },
+                "inputHash": "101dca5cad7592691bc9433b89a119292259a6992a432040fe29f19d1c3f1d56",
+                "createdAt": "2026-10-01T09:00:00.000Z"
+              },
+              {
+                "verseId": "01JAS000000000000000000V06",
+                "model": "openai-stub-large",
+                "value": 1,
+                "confidence": 0.8,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-large** (заглушка) прочла толкований за «Соответствует»: 1 (233 знаков), за «Не соответствует»: 1 (129 знаков): стих подтверждает позицию «Соответствует».",
+                  "en": "**openai-stub-large** (stub) read 1 interpretation(s) for “Consistent” (233 characters) and 1 for “Not consistent” (129 characters): the verse supports “Consistent”."
+                },
+                "inputHash": "101dca5cad7592691bc9433b89a119292259a6992a432040fe29f19d1c3f1d56",
+                "createdAt": "2026-10-01T09:00:00.000Z"
+              }
+            ]
+          },
+          "argument": {
+            "id": "01JAS000000000000000000A01",
+            "tally": {
+              "users": {
+                "pro": 4,
+                "con": 2,
+                "none": 0,
+                "open": 1
+              },
+              "ai": {
+                "pro": 2,
+                "con": 1,
+                "none": 3,
+                "open": 1
+              },
+              "aiStatus": "pending"
+            }
+          },
+          "question": {
+            "id": "01JAS000000000000000000Q01",
+            "tally": {
+              "users": {
+                "pro": 7,
+                "con": 6,
+                "none": 1,
+                "open": 3
+              },
+              "ai": {
+                "pro": 3,
+                "con": 2,
+                "none": 10,
+                "open": 2
+              },
+              "aiStatus": "pending"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

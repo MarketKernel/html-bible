@@ -1,0 +1,350 @@
+{
+  "comment": "Demo topic (Task.md §4). Verses are shared by both sides; each side explains them in its column. Both languages are written out. Written to present both readings fairly.",
+  "evaluatedAt": "2026-10-01T09:00:00.000Z",
+  "users": [
+    { "key": "anna", "provider": "google", "displayName": "Anna", "createdAt": "2026-09-28T08:00:00.000Z" },
+    { "key": "david", "provider": "microsoft", "displayName": "David", "createdAt": "2026-09-28T08:30:00.000Z" },
+    { "key": "elena", "provider": "apple", "displayName": "Elena", "createdAt": "2026-09-29T10:00:00.000Z" },
+    { "key": "mikhail", "provider": "google", "displayName": "Mikhail", "createdAt": "2026-09-29T11:00:00.000Z" },
+    { "key": "sarah", "provider": "apple", "displayName": "Sarah", "createdAt": "2026-09-29T12:00:00.000Z" }
+  ],
+  "questions": [
+    {
+      "id": "01JAS000000000000000000Q01",
+      "author": "anna",
+      "createdAt": "2026-09-28T09:00:00.000Z",
+      "title": {
+        "orig": "ru",
+        "ru": "Соответствует ли учение о Троице Библии?",
+        "en": "Is the doctrine of the Trinity consistent with the Bible?"
+      },
+      "summaryMd": {
+        "orig": "ru",
+        "ru": "Учение о Троице утверждает, что один Бог существует в трёх лицах — Отце, Сыне и Святом Духе. В каждой подтеме собраны стихи, на которые ссылаются обе стороны; голосуйте, какую позицию подтверждает стих, и объясняйте своё прочтение в колонке своей позиции.\n\nУважайте собеседников: по этому вопросу искренние христиане приходят к разным выводам.",
+        "en": "The doctrine of the Trinity holds that one God exists in three persons — the Father, the Son and the Holy Spirit. Each subtopic collects verses that both sides cite; vote on which position a verse supports, and explain your reading in your position's column.\n\nBe respectful: sincere Christians reach different conclusions on this question."
+      },
+      "sides": {
+        "pro": { "orig": "ru", "ru": "Соответствует", "en": "Consistent" },
+        "con": { "orig": "ru", "ru": "Не соответствует", "en": "Not consistent" }
+      },
+      "tags": ["trinity", "christology", "holy-spirit"]
+    }
+  ],
+  "arguments": [
+    {
+      "id": "01JAS000000000000000000A01",
+      "questionId": "01JAS000000000000000000Q01",
+      "author": "david",
+      "createdAt": "2026-09-28T10:00:00.000Z",
+      "title": { "orig": "en", "ru": "Божественность Иисуса", "en": "The deity of Jesus" },
+      "summaryMd": {
+        "orig": "en",
+        "ru": "Представляют ли тексты Иисуса Богом в полном смысле слова — или Божьим посланником, отличным от Бога и подчинённым Ему?",
+        "en": "Do the texts present Jesus as God in the full sense — or as God’s agent, distinct from God and subordinate to him?"
+      }
+    },
+    {
+      "id": "01JAS000000000000000000A02",
+      "questionId": "01JAS000000000000000000Q01",
+      "author": "anna",
+      "createdAt": "2026-09-28T11:00:00.000Z",
+      "title": { "orig": "ru", "ru": "Личность Святого Духа", "en": "The personhood of the Holy Spirit" },
+      "summaryMd": {
+        "orig": "ru",
+        "ru": "Описывает ли Писание Святого Духа как лицо, равное Отцу и Сыну, — или как силу и действие Бога?",
+        "en": "Does Scripture describe the Holy Spirit as a person equal to the Father and the Son — or as God’s power and activity?"
+      }
+    },
+    {
+      "id": "01JAS000000000000000000A03",
+      "questionId": "01JAS000000000000000000Q01",
+      "author": "david",
+      "createdAt": "2026-09-28T12:00:00.000Z",
+      "title": {
+        "orig": "en",
+        "ru": "Единство Бога: Отец — «единый истинный Бог»",
+        "en": "The oneness of God: the Father as “the only true God”"
+      },
+      "summaryMd": {
+        "orig": "en",
+        "ru": "Библия настойчиво говорит, что Бог один. Совместимо ли это с тремя лицами — или «единый Бог» в Новом Завете означает Отца?",
+        "en": "The Bible insists that God is one. Is that compatible with three persons — or does “one God” in the New Testament mean the Father?"
+      }
+    }
+  ],
+  "verses": [
+    { "id": "01JAS000000000000000000V01", "argumentId": "01JAS000000000000000000A01", "ref": { "from": "JHN.1.1", "to": "JHN.1.1" }, "author": "anna", "createdAt": "2026-09-28T10:05:00.000Z" },
+    { "id": "01JAS000000000000000000V02", "argumentId": "01JAS000000000000000000A01", "ref": { "from": "JHN.10.30", "to": "JHN.10.30" }, "author": "david", "createdAt": "2026-09-28T10:10:00.000Z" },
+    { "id": "01JAS000000000000000000V03", "argumentId": "01JAS000000000000000000A01", "ref": { "from": "JHN.20.28", "to": "JHN.20.28" }, "author": "anna", "createdAt": "2026-09-28T10:15:00.000Z" },
+    { "id": "01JAS000000000000000000V04", "argumentId": "01JAS000000000000000000A01", "ref": { "from": "PHP.2.6", "to": "PHP.2.7" }, "author": "david", "createdAt": "2026-09-28T10:20:00.000Z" },
+    { "id": "01JAS000000000000000000V05", "argumentId": "01JAS000000000000000000A01", "ref": { "from": "COL.2.9", "to": "COL.2.9" }, "author": "anna", "createdAt": "2026-09-28T10:25:00.000Z" },
+    { "id": "01JAS000000000000000000V06", "argumentId": "01JAS000000000000000000A01", "ref": { "from": "MRK.13.32", "to": "MRK.13.32" }, "author": "david", "createdAt": "2026-09-28T10:30:00.000Z" },
+    { "id": "01JAS000000000000000000V07", "argumentId": "01JAS000000000000000000A01", "ref": { "from": "JHN.14.28", "to": "JHN.14.28" }, "author": "anna", "createdAt": "2026-09-28T10:35:00.000Z" },
+    { "id": "01JAS000000000000000000V08", "argumentId": "01JAS000000000000000000A02", "ref": { "from": "MAT.28.19", "to": "MAT.28.19" }, "author": "david", "createdAt": "2026-09-28T11:05:00.000Z" },
+    { "id": "01JAS000000000000000000V09", "argumentId": "01JAS000000000000000000A02", "ref": { "from": "ACT.5.3", "to": "ACT.5.4" }, "author": "anna", "createdAt": "2026-09-28T11:10:00.000Z" },
+    { "id": "01JAS000000000000000000V10", "argumentId": "01JAS000000000000000000A02", "ref": { "from": "2CO.13.14", "to": "2CO.13.14" }, "author": "david", "createdAt": "2026-09-28T11:15:00.000Z" },
+    { "id": "01JAS000000000000000000V11", "argumentId": "01JAS000000000000000000A02", "ref": { "from": "JHN.14.26", "to": "JHN.14.26" }, "author": "anna", "createdAt": "2026-09-28T11:20:00.000Z" },
+    { "id": "01JAS000000000000000000V12", "argumentId": "01JAS000000000000000000A02", "ref": { "from": "LUK.1.35", "to": "LUK.1.35" }, "author": "david", "createdAt": "2026-09-28T11:25:00.000Z" },
+    { "id": "01JAS000000000000000000V13", "argumentId": "01JAS000000000000000000A03", "ref": { "from": "GEN.1.26", "to": "GEN.1.27" }, "author": "anna", "createdAt": "2026-09-28T12:05:00.000Z" },
+    { "id": "01JAS000000000000000000V14", "argumentId": "01JAS000000000000000000A03", "ref": { "from": "DEU.6.4", "to": "DEU.6.4" }, "author": "david", "createdAt": "2026-09-28T12:10:00.000Z" },
+    { "id": "01JAS000000000000000000V15", "argumentId": "01JAS000000000000000000A03", "ref": { "from": "JHN.17.3", "to": "JHN.17.3" }, "author": "anna", "createdAt": "2026-09-28T12:15:00.000Z" },
+    { "id": "01JAS000000000000000000V16", "argumentId": "01JAS000000000000000000A03", "ref": { "from": "1CO.8.6", "to": "1CO.8.6" }, "author": "david", "createdAt": "2026-09-28T12:20:00.000Z" },
+    { "id": "01JAS000000000000000000V17", "argumentId": "01JAS000000000000000000A03", "ref": { "from": "1TI.2.5", "to": "1TI.2.5" }, "author": "anna", "createdAt": "2026-09-28T12:25:00.000Z" }
+  ],
+  "interpretations": [
+    {
+      "id": "01JAS000000000000000000T01", "verseId": "01JAS000000000000000000V01", "side": "pro", "author": "anna", "createdAt": "2026-09-28T13:00:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "«Слово было у Бога, и Слово было Бог»: Слово отлично от Отца («у Бога») и при этом названо Богом. Это и есть различие лиц при едином Божестве.",
+        "en": "“The Word was with God, and the Word was God”: the Word is distinct from the Father (“with God”) and yet is called God — distinct persons sharing one deity." }
+    },
+    {
+      "id": "01JAS000000000000000000T02", "verseId": "01JAS000000000000000000V01", "side": "con", "author": "david", "createdAt": "2026-09-28T13:05:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "По-гречески второе «Бог» (θεός) стоит без артикля, в отличие от «у Бога» (τὸν θεόν). Часть читателей видят здесь божественное качество Слова («Слово было божественно»), а не тождество с единым Богом.",
+        "en": "In Greek the second “God” (θεός) has no article, unlike “with God” (τὸν θεόν). Some read it as the Word’s divine quality (“the Word was divine”), not identity with the one God." }
+    },
+    {
+      "id": "01JAS000000000000000000T03", "verseId": "01JAS000000000000000000V01", "side": "pro", "author": "elena", "createdAt": "2026-09-28T13:10:00.000Z",
+      "replyTo": "01JAS000000000000000000T02",
+      "bodyMd": { "orig": "ru",
+        "ru": "Отсутствие артикля обычно для сказуемого, стоящего перед связкой, и само по себе не делает слово качественным. К тому же в ст. 3 всё сотворено через Слово — Слово не среди сотворённого.",
+        "en": "A missing article is normal for a predicate placed before the verb and does not by itself make the word qualitative. Besides, verse 3 says all things were made through the Word — the Word is not among things made." }
+    },
+    {
+      "id": "01JAS000000000000000000T04", "verseId": "01JAS000000000000000000V02", "side": "pro", "author": "anna", "createdAt": "2026-09-28T13:15:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "«Я и Отец — одно»: слушатели взялись за камни, поняв это как притязание быть Богом (ст. 33), и Иисус не отказывается от сказанного.",
+        "en": "“I and my Father are one”: the hearers took up stones, understanding it as a claim to be God (v. 33), and Jesus does not retract it." }
+    },
+    {
+      "id": "01JAS000000000000000000T05", "verseId": "01JAS000000000000000000V02", "side": "con", "author": "david", "createdAt": "2026-09-28T13:20:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "«Одно» (ἕν) — среднего рода: единство воли и цели, а не одно лицо. Тем же словом Иисус молится, чтобы ученики «были едино, как и Мы» (Ин 17:11, 22).",
+        "en": "“One” (ἕν) is neuter: unity of will and purpose, not one person. Jesus uses the same word when he prays that his disciples “may be one, as we are” (John 17:11, 22)." }
+    },
+    {
+      "id": "01JAS000000000000000000T06", "verseId": "01JAS000000000000000000V03", "side": "pro", "author": "david", "createdAt": "2026-09-28T13:25:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "Фома говорит Иисусу: «Господь мой и Бог мой!» — обращаясь к Нему («сказал Ему»), и Иисус не поправляет его, а называет эту веру блаженной.",
+        "en": "Thomas says to Jesus “My Lord and my God” — addressed to him (“said unto him”), and Jesus blesses this faith rather than correcting it." }
+    },
+    {
+      "id": "01JAS000000000000000000T07", "verseId": "01JAS000000000000000000V03", "side": "con", "author": "anna", "createdAt": "2026-09-28T13:30:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "Восклицание можно понять как изумление, обращённое и к Богу, явившему Себя в воскресении. В той же главе Иисус называет Отца «Богом Моим» (Ин 20:17).",
+        "en": "The cry can be read as amazement directed also at God, who revealed himself in the resurrection. In the same chapter Jesus calls the Father “my God” (John 20:17)." }
+    },
+    {
+      "id": "01JAS000000000000000000T08", "verseId": "01JAS000000000000000000V04", "side": "pro", "author": "anna", "createdAt": "2026-09-28T13:35:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "Христос был «в образе Божием» и «не почитал хищением быть равным Богу», но «уничижил Себя». Уничижить можно то, что имеешь: равенство с Богом здесь предшествует воплощению.",
+        "en": "Christ was “in the form of God” and “thought it not robbery to be equal with God”, yet “made himself of no reputation”. One can only lay aside what one has: equality with God precedes the incarnation." }
+    },
+    {
+      "id": "01JAS000000000000000000T09", "verseId": "01JAS000000000000000000V04", "side": "con", "author": "david", "createdAt": "2026-09-28T13:40:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "Многие переводы передают это как «не считал равенство с Богом тем, что нужно схватить»: Христос, в отличие от Адама, не стремился к равенству. Отрывок восхваляет смирение и не говорит, что равенство у Него было.",
+        "en": "Many translations render it “did not regard equality with God as something to be grasped”: Christ, unlike Adam, did not reach for equality. The passage praises humility and does not say he possessed it." }
+    },
+    {
+      "id": "01JAS000000000000000000T10", "verseId": "01JAS000000000000000000V05", "side": "pro", "author": "elena", "createdAt": "2026-09-28T13:45:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "«В Нём обитает вся полнота Божества телесно»: не доля божественности, а вся она (θεότης — Божество, а не просто божественное свойство).",
+        "en": "“In him dwelleth all the fulness of the Godhead bodily”: not a share of divinity but all of it (θεότης — deity itself, not merely a divine quality)." }
+    },
+    {
+      "id": "01JAS000000000000000000T11", "verseId": "01JAS000000000000000000V05", "side": "con", "author": "david", "createdAt": "2026-09-28T13:50:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "Павел молится и о том, чтобы верующие «исполнились всею полнотою Божиею» (Еф 3:19). Полнота во Христе может означать присутствие Бога, данное Ему Отцом: «благоугодно было Отцу» (Кол 1:19).",
+        "en": "Paul also prays that believers “be filled with all the fulness of God” (Eph 3:19). The fulness in Christ can mean God’s presence given to him by the Father: “it pleased the Father” (Col 1:19)." }
+    },
+    {
+      "id": "01JAS000000000000000000T12", "verseId": "01JAS000000000000000000V06", "side": "con", "author": "david", "createdAt": "2026-09-28T13:55:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "Сын не знает ни дня, ни часа — знает только Отец. Незнание трудно согласовать с полнотой Божества.",
+        "en": "The Son does not know the day or the hour; only the Father does. Not knowing something is hard to reconcile with being fully God." }
+    },
+    {
+      "id": "01JAS000000000000000000T13", "verseId": "01JAS000000000000000000V06", "side": "pro", "author": "anna", "createdAt": "2026-09-28T14:00:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "Учение о двух природах: как человек Иисус ограничил Себя («уничижил Себя», Флп 2:7), поэтому и говорит о незнании. А «Сын» в этом стихе назван выше Ангелов — это указывает на Его особое положение.",
+        "en": "The doctrine of two natures: as a man Jesus limited himself (“made himself of no reputation”, Phil 2:7), so he can speak of not knowing. And “the Son” in this very verse is named above the angels, which points to his unique standing." }
+    },
+    {
+      "id": "01JAS000000000000000000T14", "verseId": "01JAS000000000000000000V07", "side": "con", "author": "anna", "createdAt": "2026-09-28T14:05:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "«Отец Мой более Меня» — прямое утверждение неравенства, без оговорок о природах.",
+        "en": "“My Father is greater than I” — a direct statement of inequality, with no qualification about natures." }
+    },
+    {
+      "id": "01JAS000000000000000000T15", "verseId": "01JAS000000000000000000V07", "side": "pro", "author": "david", "createdAt": "2026-09-28T14:10:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "«Более» (μείζων) говорит о положении, а не о природе: Сын на земле, посланный и послушный, идёт к пославшему Отцу. Сын может быть ниже отца по положению при одной с ним природе.",
+        "en": "“Greater” (μείζων) speaks of position, not nature: the Son on earth, sent and obedient, goes to the Father who sent him. A son can be lower than his father in rank while sharing his nature." }
+    },
+    {
+      "id": "01JAS000000000000000000T16", "verseId": "01JAS000000000000000000V07", "side": "con", "author": "elena", "createdAt": "2026-09-28T14:15:00.000Z",
+      "replyTo": "01JAS000000000000000000T15",
+      "bodyMd": { "orig": "ru",
+        "ru": "Но и после воскресения Иисус по-прежнему называет Отца «Богом Моим» (Ин 20:17; Откр 3:12) — подчинение не заканчивается с земным служением.",
+        "en": "Yet after the resurrection Jesus still calls the Father “my God” (John 20:17; Rev 3:12) — the subordination does not end with his earthly ministry." }
+    },
+    {
+      "id": "01JAS000000000000000000T17", "verseId": "01JAS000000000000000000V08", "side": "pro", "author": "david", "createdAt": "2026-09-28T14:20:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "Крещение «во имя» (ед. ч.) «Отца и Сына и Святого Духа»: одно имя на троих, и Дух поставлен в один ряд с Отцом и Сыном.",
+        "en": "Baptism “in the name” (singular) “of the Father, and of the Son, and of the Holy Ghost”: one name shared by three, with the Spirit placed alongside the Father and the Son." }
+    },
+    {
+      "id": "01JAS000000000000000000T18", "verseId": "01JAS000000000000000000V08", "side": "con", "author": "anna", "createdAt": "2026-09-28T14:25:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "«Во имя» значит «властью, по поручению». В Деяниях крестят «во имя Иисуса Христа» (Деян 2:38; 10:48) — формула не обязательно учит о трёх равных лицах.",
+        "en": "“In the name” means “by the authority of”. In Acts people are baptised “in the name of Jesus Christ” (Acts 2:38; 10:48) — the formula need not teach three equal persons." }
+    },
+    {
+      "id": "01JAS000000000000000000T19", "verseId": "01JAS000000000000000000V09", "side": "pro", "author": "anna", "createdAt": "2026-09-28T14:30:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "«Солгать Духу Святому» (ст. 3) — это «солгал не человекам, а Богу» (ст. 4). Солгать можно лицу; и это лицо названо Богом.",
+        "en": "“Lie to the Holy Ghost” (v. 3) is “thou hast not lied unto men, but unto God” (v. 4). One lies to a person, and that person is called God." }
+    },
+    {
+      "id": "01JAS000000000000000000T20", "verseId": "01JAS000000000000000000V09", "side": "con", "author": "david", "createdAt": "2026-09-28T14:35:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "Солгать Духу Божию — значит солгать Богу, как солгать духу человека — значит солгать ему самому; отдельного лица это не требует.",
+        "en": "Lying to God’s Spirit is lying to God, just as lying to a man’s spirit is lying to the man; it does not require the Spirit to be a separate person." }
+    },
+    {
+      "id": "01JAS000000000000000000T21", "verseId": "01JAS000000000000000000V10", "side": "pro", "author": "elena", "createdAt": "2026-09-28T14:40:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "Благодать Господа Иисуса Христа, любовь Бога, общение Святого Духа: благословение называет троих рядом как источник жизни Церкви.",
+        "en": "The grace of the Lord Jesus Christ, the love of God, the communion of the Holy Ghost: the blessing names the three side by side as the source of the church’s life." }
+    },
+    {
+      "id": "01JAS000000000000000000T22", "verseId": "01JAS000000000000000000V10", "side": "con", "author": "anna", "createdAt": "2026-09-28T14:45:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "Обычные приветствия Павла называют только Бога Отца и Господа Иисуса Христа (Рим 1:7; 1 Кор 1:3). Одна тройная формула показывает связь, но не равенство.",
+        "en": "Paul’s usual greetings name only God the Father and the Lord Jesus Christ (Rom 1:7; 1 Cor 1:3). One threefold formula shows association, not equality." }
+    },
+    {
+      "id": "01JAS000000000000000000T23", "verseId": "01JAS000000000000000000V11", "side": "pro", "author": "anna", "createdAt": "2026-09-28T14:50:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "Утешитель «научит вас всему и напомнит вам всё»: учить и напоминать — действия лица. По-гречески о Духе (πνεῦμα, ср. род) сказано ἐκεῖνος — «Он».",
+        "en": "The Comforter “shall teach you all things, and bring all things to your remembrance”: teaching and reminding are personal acts. The Greek uses ἐκεῖνος (“he”) of the Spirit (πνεῦμα, neuter)." }
+    },
+    {
+      "id": "01JAS000000000000000000T24", "verseId": "01JAS000000000000000000V11", "side": "con", "author": "david", "createdAt": "2026-09-28T14:55:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "ἐκεῖνος согласуется с «Утешителем» (παράκλητος, муж. род), а не с «Духом». Писание олицетворяет и премудрость, и грех, и смерть (Притч 8; Рим 5:14), не делая их лицами.",
+        "en": "ἐκεῖνος agrees with “Comforter” (παράκλητος, masculine), not with “Spirit”. Scripture personifies wisdom, sin and death too (Prov 8; Rom 5:14) without making them persons." }
+    },
+    {
+      "id": "01JAS000000000000000000T25", "verseId": "01JAS000000000000000000V12", "side": "con", "author": "david", "createdAt": "2026-09-28T15:00:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "«Дух Святый найдёт на Тебя, и сила Всевышнего осенит Тебя»: еврейский параллелизм приравнивает Духа Святого к силе Бога.",
+        "en": "“The Holy Ghost shall come upon thee, and the power of the Highest shall overshadow thee”: Hebrew parallelism equates the Holy Spirit with God’s power." }
+    },
+    {
+      "id": "01JAS000000000000000000T26", "verseId": "01JAS000000000000000000V12", "side": "pro", "author": "anna", "createdAt": "2026-09-28T15:05:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "Параллелизм не обязательно означает тождество: Дух действует силой Всевышнего. В Деян 10:38 Бог помазал Иисуса «Духом Святым и силою» — Дух и сила названы отдельно.",
+        "en": "Parallelism need not mean identity: the Spirit acts with the power of the Highest. In Acts 10:38 God anointed Jesus “with the Holy Ghost and with power” — Spirit and power are named separately." }
+    },
+    {
+      "id": "01JAS000000000000000000T27", "verseId": "01JAS000000000000000000V13", "side": "pro", "author": "anna", "createdAt": "2026-09-28T15:10:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "«Сотворим человека по образу Нашему»: Бог говорит во множественном числе, а в ст. 27 «сотворил» — в единственном. Множественность внутри единого Бога.",
+        "en": "“Let us make man in our image”: God speaks in the plural, and in v. 27 “created” is singular. Plurality within the one God." }
+    },
+    {
+      "id": "01JAS000000000000000000T28", "verseId": "01JAS000000000000000000V13", "side": "con", "author": "david", "createdAt": "2026-09-28T15:15:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "Иудейские толкователи издавна понимают «Нам» как обращение Бога к небесному собранию (ср. 3 Цар 22:19–20; Ис 6:8) или как множественное величия; о трёх лицах сам текст не говорит.",
+        "en": "Jewish readers have long taken “us” as God addressing the heavenly court (cf. 1 Kings 22:19–20; Isa 6:8) or as a plural of majesty; the text itself does not speak of three persons." }
+    },
+    {
+      "id": "01JAS000000000000000000T29", "verseId": "01JAS000000000000000000V14", "side": "con", "author": "david", "createdAt": "2026-09-28T15:20:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "«Господь, Бог наш, Господь един есть». Израиль исповедовал Бога как одно лицо; Иисус приводит эти слова как первую заповедь (Мк 12:29).",
+        "en": "“The LORD our God is one LORD.” Israel confessed God as a single person; Jesus quotes it as the first commandment (Mark 12:29)." }
+    },
+    {
+      "id": "01JAS000000000000000000T30", "verseId": "01JAS000000000000000000V14", "side": "pro", "author": "anna", "createdAt": "2026-09-28T15:25:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "«Един» (эхад) может обозначать составное единство: «одна плоть» (Быт 2:24). Шема утверждает единство Бога — с этим согласны и сторонники учения о Троице.",
+        "en": "“One” (echad) can denote a compound unity: “one flesh” (Gen 2:24). The Shema affirms the oneness of God — which Trinitarians affirm as well." }
+    },
+    {
+      "id": "01JAS000000000000000000T31", "verseId": "01JAS000000000000000000V15", "side": "con", "author": "david", "createdAt": "2026-09-28T15:30:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "Иисус молится Отцу: «да знают Тебя, единого истинного Бога, и посланного Тобою Иисуса Христа». Единый истинный Бог — Отец, отличный от Посланного.",
+        "en": "Jesus prays to the Father: “that they might know thee the only true God, and Jesus Christ, whom thou hast sent.” The only true God is the Father, distinct from the one he sent." }
+    },
+    {
+      "id": "01JAS000000000000000000T32", "verseId": "01JAS000000000000000000V15", "side": "pro", "author": "anna", "createdAt": "2026-09-28T15:35:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "«Единый истинный» противопоставляет Бога идолам, а не Сыну. Тот же Иоанн называет Иисуса «истинным Богом» (1 Ин 5:20), а в Ин 17:5 Сын разделяет славу Отца «прежде бытия мира».",
+        "en": "“The only true” contrasts God with idols, not with the Son. The same John calls Jesus “the true God” (1 John 5:20), and in John 17:5 the Son shares the Father’s glory “before the world was”." }
+    },
+    {
+      "id": "01JAS000000000000000000T33", "verseId": "01JAS000000000000000000V16", "side": "con", "author": "anna", "createdAt": "2026-09-28T15:40:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "«У нас один Бог Отец… и один Господь Иисус Христос». Павел называет «единым Богом» именно Отца и отличает от Него Господа Иисуса.",
+        "en": "“To us there is but one God, the Father… and one Lord Jesus Christ.” Paul names the Father as the one God and distinguishes the Lord Jesus from him." }
+    },
+    {
+      "id": "01JAS000000000000000000T34", "verseId": "01JAS000000000000000000V16", "side": "pro", "author": "david", "createdAt": "2026-09-28T15:45:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "Павел перефразирует Шему: «Бог» и «Господь» — два слова из «Господь, Бог наш, Господь един». Он помещает Иисуса внутрь этого исповедания и приписывает Ему творение («Которым всё»).",
+        "en": "Paul is reworking the Shema: “God” and “Lord” are the two words of “the LORD our God is one LORD”. He places Jesus inside that confession and gives him the work of creation (“by whom are all things”)." }
+    },
+    {
+      "id": "01JAS000000000000000000T35", "verseId": "01JAS000000000000000000V17", "side": "con", "author": "david", "createdAt": "2026-09-28T15:50:00.000Z",
+      "bodyMd": { "orig": "en",
+        "ru": "«Един Бог, един и посредник между Богом и человеками, человек Христос Иисус»: посредник отделён от единого Бога и назван человеком.",
+        "en": "“One God, and one mediator between God and men, the man Christ Jesus”: the mediator is set apart from the one God and called a man." }
+    },
+    {
+      "id": "01JAS000000000000000000T36", "verseId": "01JAS000000000000000000V17", "side": "pro", "author": "anna", "createdAt": "2026-09-28T15:55:00.000Z",
+      "bodyMd": { "orig": "ru",
+        "ru": "Посредником Христос назван именно как человек — по человеческой природе. Тот же Павел называет Его «великим Богом и Спасителем нашим» (Тит 2:13).",
+        "en": "Christ is called mediator precisely as a man — in his human nature. The same Paul calls him “the great God and our Saviour” (Titus 2:13)." }
+    }
+  ],
+  "votes": {
+    "01JAS000000000000000000V01": { "anna": 1, "david": -1, "elena": 1, "mikhail": 1 },
+    "01JAS000000000000000000V02": { "anna": 1, "david": -1, "elena": 1, "sarah": -1 },
+    "01JAS000000000000000000V03": { "anna": 1, "elena": 1, "mikhail": 1, "david": 0 },
+    "01JAS000000000000000000V04": { "anna": 1, "elena": 1, "david": -1 },
+    "01JAS000000000000000000V05": { "elena": 1, "sarah": 1 },
+    "01JAS000000000000000000V06": { "david": -1, "mikhail": -1, "sarah": -1, "anna": 1 },
+    "01JAS000000000000000000V07": { "david": -1, "anna": -1, "sarah": -1, "elena": 1 },
+    "01JAS000000000000000000V08": { "anna": 1, "david": 1, "elena": 1, "mikhail": -1, "sarah": 0 },
+    "01JAS000000000000000000V09": { "anna": 1, "elena": 1, "david": -1 },
+    "01JAS000000000000000000V10": { "elena": 1, "mikhail": 1, "anna": 0, "david": -1 },
+    "01JAS000000000000000000V11": { "anna": 1, "david": -1 },
+    "01JAS000000000000000000V12": { "david": -1, "sarah": -1, "anna": 1 },
+    "01JAS000000000000000000V13": { "david": -1, "mikhail": -1, "anna": 1 },
+    "01JAS000000000000000000V14": { "anna": 0, "david": 0, "elena": -1, "sarah": 0 },
+    "01JAS000000000000000000V15": { "david": -1, "mikhail": -1, "sarah": -1, "anna": 1 },
+    "01JAS000000000000000000V16": { "anna": -1, "david": 1, "elena": 1, "sarah": -1 },
+    "01JAS000000000000000000V17": { "david": -1, "sarah": -1, "elena": 1 }
+  },
+  "interpretationVotes": {
+    "01JAS000000000000000000T01": {"elena": 1, "mikhail": 1, "david": -1},
+    "01JAS000000000000000000T02": {"sarah": 1, "anna": -1, "mikhail": -1},
+    "01JAS000000000000000000T03": {"anna": 1, "mikhail": 1, "sarah": 1},
+    "01JAS000000000000000000T05": {"sarah": 1, "mikhail": 1},
+    "01JAS000000000000000000T06": {"anna": 1, "elena": 1, "sarah": -1},
+    "01JAS000000000000000000T09": {"anna": -1, "sarah": 1},
+    "01JAS000000000000000000T12": {"sarah": 1, "mikhail": 1, "anna": -1},
+    "01JAS000000000000000000T13": {"elena": 1, "david": -1},
+    "01JAS000000000000000000T15": {"anna": 1, "elena": -1},
+    "01JAS000000000000000000T16": {"sarah": 1, "david": 1},
+    "01JAS000000000000000000T17": {"mikhail": 1},
+    "01JAS000000000000000000T23": {"sarah": -1, "mikhail": 1},
+    "01JAS000000000000000000T29": {"anna": 1, "sarah": 1},
+    "01JAS000000000000000000T31": {"mikhail": 1, "elena": -1},
+    "01JAS000000000000000000T34": {"anna": 1}
+  }
+}

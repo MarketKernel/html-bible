@@ -1,0 +1,22 @@
+{
+  "name": "argument-delete-soft",
+  "description": "A subtopic with verses is kept as deleted (texts emptied); its verses stay.",
+  "steps": [
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/v1/arguments/01JAS000000000000000000A02",
+        "headers": {
+          "Authorization": "Bearer <jwt:anna>"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "01JAS000000000000000000A02",
+          "deleted": "soft"
+        }
+      }
+    }
+  ]
+}

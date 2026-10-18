@@ -1,0 +1,24 @@
+{
+  "name": "invalid-token",
+  "description": "A malformed, forged or foreign token: 401 invalid_token (an expired one gives token_expired).",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/me",
+        "headers": {
+          "Authorization": "Bearer not.a.token"
+        }
+      },
+      "response": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "invalid_token",
+            "message": "Malformed token"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+# Cloudflare Pages headers for build/cloudflare/ (build_scripts/cloudflare.sh).
+#
+# data/: any origin may read it — the single file opened from disk is origin
+# "null" and downloads from here. The .gz files are the data itself, served
+# as application/gzip and unpacked by the page: no-transform keeps Cloudflare
+# from compressing or decompressing them on the way. Revalidated every time,
+# because the paths have no version in them and the page checks each file
+# against the catalog's sha256.
+/data/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
+
+/*
+  X-Content-Type-Options: nosniff

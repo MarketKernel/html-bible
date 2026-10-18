@@ -1,0 +1,57 @@
+{
+  "name": "verse-tags",
+  "description": "Verses of one chapter that are stones in discussions; one tag per verse key and ArgumentVerse, ranges expanded, with both outcomes.",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/verse-tags?book=JHN&chapter=14&lang=en"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "book": "JHN",
+          "chapter": 14,
+          "tags": [
+            {
+              "key": "JHN.14.26",
+              "questionId": "01JAS000000000000000000Q01",
+              "questionTitle": {
+                "orig": "ru",
+                "ru": "Соответствует ли учение о Троице Библии?",
+                "en": "Is the doctrine of the Trinity consistent with the Bible?"
+              },
+              "argumentId": "01JAS000000000000000000A02",
+              "argumentTitle": {
+                "orig": "ru",
+                "ru": "Личность Святого Духа",
+                "en": "The personhood of the Holy Spirit"
+              },
+              "verseId": "01JAS000000000000000000V11",
+              "users": null,
+              "ai": 0
+            },
+            {
+              "key": "JHN.14.28",
+              "questionId": "01JAS000000000000000000Q01",
+              "questionTitle": {
+                "orig": "ru",
+                "ru": "Соответствует ли учение о Троице Библии?",
+                "en": "Is the doctrine of the Trinity consistent with the Bible?"
+              },
+              "argumentId": "01JAS000000000000000000A01",
+              "argumentTitle": {
+                "orig": "en",
+                "ru": "Божественность Иисуса",
+                "en": "The deity of Jesus"
+              },
+              "verseId": "01JAS000000000000000000V07",
+              "users": -1,
+              "ai": -1
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "format": "html-bible/catalog",
+  "formatVersion": 1,
+  "translations": [
+    {
+      "id": "en-kjv",
+      "linkName": "KJV",
+      "lang": "en",
+      "name": "King James Version",
+      "shortName": "KJV",
+      "version": "1.0.0",
+      "url": "translations/en-kjv.json.gz",
+      "bytes": 33803,
+      "sha256": "67d1171affa424a15b52ef265548618d3a3e189ef384016e1efc8808158f90d4",
+      "license": "Public domain"
+    },
+    {
+      "id": "ru-synodal",
+      "linkName": "Synodal",
+      "lang": "ru",
+      "name": "Синодальный перевод",
+      "shortName": "SYN",
+      "version": "1.0.0",
+      "url": "translations/ru-synodal.json.gz",
+      "bytes": 43110,
+      "sha256": "47e464c9752d2bc0a71f9f8b2d9841f7e53ecd02c79078c5bb3fbfe08239dea0",
+      "license": "Public domain"
+    }
+  ],
+  "commentaries": [
+    {
+      "id": "ru-lopukhin",
+      "lang": "ru",
+      "name": "Толковая Библия Лопухина",
+      "version": "1.0.0",
+      "manifest": "commentaries/ru-lopukhin/manifest.json",
+      "bytes": 17323,
+      "license": "Public domain"
+    }
+  ]
+}

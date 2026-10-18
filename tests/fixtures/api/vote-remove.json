@@ -1,0 +1,68 @@
+{
+  "name": "vote-remove",
+  "description": "null removes the caller's vote.",
+  "steps": [
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/votes/verse/01JAS000000000000000000V05",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "value": null
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "votes": {
+            "pro": 1,
+            "con": 0,
+            "none": 0,
+            "mine": null
+          },
+          "users": {
+            "outcome": 1
+          },
+          "argument": {
+            "id": "01JAS000000000000000000A01",
+            "tally": {
+              "users": {
+                "pro": 4,
+                "con": 2,
+                "none": 0,
+                "open": 1
+              },
+              "ai": {
+                "pro": 2,
+                "con": 1,
+                "none": 3,
+                "open": 1
+              },
+              "aiStatus": "fresh"
+            }
+          },
+          "question": {
+            "id": "01JAS000000000000000000Q01",
+            "tally": {
+              "users": {
+                "pro": 7,
+                "con": 6,
+                "none": 1,
+                "open": 3
+              },
+              "ai": {
+                "pro": 3,
+                "con": 2,
+                "none": 10,
+                "open": 2
+              },
+              "aiStatus": "fresh"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

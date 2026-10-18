@@ -1,0 +1,28 @@
+{
+  "name": "vote-interpretation",
+  "description": "Rate an interpretation + (1) or − (-1). The response has only its counts. These votes rank interpretations and never affect verse outcomes, tallies or the AI.",
+  "steps": [
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/votes/interpretation/01JAS000000000000000000T01",
+        "headers": {
+          "Authorization": "Bearer <jwt:sarah>"
+        },
+        "body": {
+          "value": 1
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "votes": {
+            "up": 3,
+            "down": 1,
+            "mine": 1
+          }
+        }
+      }
+    }
+  ]
+}

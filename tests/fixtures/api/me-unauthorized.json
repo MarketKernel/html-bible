@@ -1,0 +1,21 @@
+{
+  "name": "me-unauthorized",
+  "description": "Writing and /me need a token: 401 unauthorized.",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/me"
+      },
+      "response": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "unauthorized",
+            "message": "Sign-in required"
+          }
+        }
+      }
+    }
+  ]
+}

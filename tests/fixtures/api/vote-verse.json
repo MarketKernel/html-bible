@@ -1,0 +1,68 @@
+{
+  "name": "vote-verse",
+  "description": "Vote on a verse: 1 supports the first position, -1 the second, 0 not relevant. Here a tied verse (2:2) becomes decided. Response: the verse's votes and outcome, its subtopic's and topic's tallies.",
+  "steps": [
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/votes/verse/01JAS000000000000000000V02",
+        "headers": {
+          "Authorization": "Bearer <jwt:mikhail>"
+        },
+        "body": {
+          "value": 1
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "votes": {
+            "pro": 3,
+            "con": 2,
+            "none": 0,
+            "mine": 1
+          },
+          "users": {
+            "outcome": 1
+          },
+          "argument": {
+            "id": "01JAS000000000000000000A01",
+            "tally": {
+              "users": {
+                "pro": 5,
+                "con": 2,
+                "none": 0,
+                "open": 0
+              },
+              "ai": {
+                "pro": 2,
+                "con": 1,
+                "none": 3,
+                "open": 1
+              },
+              "aiStatus": "fresh"
+            }
+          },
+          "question": {
+            "id": "01JAS000000000000000000Q01",
+            "tally": {
+              "users": {
+                "pro": 8,
+                "con": 6,
+                "none": 1,
+                "open": 2
+              },
+              "ai": {
+                "pro": 3,
+                "con": 2,
+                "none": 10,
+                "open": 2
+              },
+              "aiStatus": "fresh"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

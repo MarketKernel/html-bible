@@ -1,0 +1,57 @@
+{
+  "name": "verse-tags-range",
+  "description": "A range (GEN 1:26–27) tags every verse it covers.",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/verse-tags?book=GEN&chapter=1"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "book": "GEN",
+          "chapter": 1,
+          "tags": [
+            {
+              "key": "GEN.1.26",
+              "questionId": "01JAS000000000000000000Q01",
+              "questionTitle": {
+                "orig": "ru",
+                "ru": "Соответствует ли учение о Троице Библии?",
+                "en": "Is the doctrine of the Trinity consistent with the Bible?"
+              },
+              "argumentId": "01JAS000000000000000000A03",
+              "argumentTitle": {
+                "orig": "en",
+                "ru": "Единство Бога: Отец — «единый истинный Бог»",
+                "en": "The oneness of God: the Father as “the only true God”"
+              },
+              "verseId": "01JAS000000000000000000V13",
+              "users": -1,
+              "ai": -1
+            },
+            {
+              "key": "GEN.1.27",
+              "questionId": "01JAS000000000000000000Q01",
+              "questionTitle": {
+                "orig": "ru",
+                "ru": "Соответствует ли учение о Троице Библии?",
+                "en": "Is the doctrine of the Trinity consistent with the Bible?"
+              },
+              "argumentId": "01JAS000000000000000000A03",
+              "argumentTitle": {
+                "orig": "en",
+                "ru": "Единство Бога: Отец — «единый истинный Бог»",
+                "en": "The oneness of God: the Father as “the only true God”"
+              },
+              "verseId": "01JAS000000000000000000V13",
+              "users": -1,
+              "ai": -1
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "vote-interpretation-zero",
+  "description": "0 is not a rating for interpretations: 400.",
+  "steps": [
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/votes/interpretation/01JAS000000000000000000T01",
+        "headers": {
+          "Authorization": "Bearer <jwt:sarah>"
+        },
+        "body": {
+          "value": 0
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"value\" must be 1, -1 or null for an interpretation",
+            "field": "value"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "name": "question-create-default-sides",
+  "description": "\"sides\" and \"tags\" may be left out: default position labels in both languages, no tags.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/questions",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "lang": "ru",
+          "title": "Было ли сотворение за шесть буквальных дней?"
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "id": "<ulid>",
+          "title": {
+            "orig": "ru",
+            "ru": "Было ли сотворение за шесть буквальных дней?",
+            "en": "[auto-translated ru→en] Было ли сотворение за шесть буквальных дней?"
+          },
+          "summaryMd": {
+            "orig": "ru",
+            "ru": "",
+            "en": ""
+          },
+          "sides": {
+            "pro": {
+              "orig": "ru",
+              "ru": "За",
+              "en": "For"
+            },
+            "con": {
+              "orig": "ru",
+              "ru": "Против",
+              "en": "Against"
+            }
+          },
+          "tags": [],
+          "author": {
+            "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
+            "displayName": "Elena"
+          },
+          "createdAt": "<iso8601>",
+          "tally": {
+            "users": {
+              "pro": 0,
+              "con": 0,
+              "none": 0,
+              "open": 0
+            },
+            "ai": {
+              "pro": 0,
+              "con": 0,
+              "none": 0,
+              "open": 0
+            },
+            "aiStatus": "none"
+          }
+        }
+      }
+    }
+  ]
+}

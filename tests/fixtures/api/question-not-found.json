@@ -1,0 +1,21 @@
+{
+  "name": "question-not-found",
+  "description": "Unknown ids: 404 not_found.",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/questions/01JAS0000000000000000NOPE0"
+      },
+      "response": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Question not found"
+          }
+        }
+      }
+    }
+  ]
+}

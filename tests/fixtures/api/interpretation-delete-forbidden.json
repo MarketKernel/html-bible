@@ -1,0 +1,24 @@
+{
+  "name": "interpretation-delete-forbidden",
+  "description": "Only the author: 403 forbidden.",
+  "steps": [
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/v1/interpretations/01JAS000000000000000000T01",
+        "headers": {
+          "Authorization": "Bearer <jwt:david>"
+        }
+      },
+      "response": {
+        "status": 403,
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "Only the author can do this"
+          }
+        }
+      }
+    }
+  ]
+}

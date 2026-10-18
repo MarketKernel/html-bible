@@ -1,0 +1,57 @@
+{
+  "name": "argument-patch",
+  "description": "Edit your own subtopic.",
+  "steps": [
+    {
+      "request": {
+        "method": "PATCH",
+        "path": "/v1/arguments/01JAS000000000000000000A02",
+        "headers": {
+          "Authorization": "Bearer <jwt:anna>"
+        },
+        "body": {
+          "lang": "en",
+          "title": "Is the Holy Spirit a person?"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "01JAS000000000000000000A02",
+          "questionId": "01JAS000000000000000000Q01",
+          "title": {
+            "orig": "en",
+            "ru": "[auto-translated en→ru] Is the Holy Spirit a person?",
+            "en": "Is the Holy Spirit a person?"
+          },
+          "summaryMd": {
+            "orig": "ru",
+            "ru": "Описывает ли Писание Святого Духа как лицо, равное Отцу и Сыну, — или как силу и действие Бога?",
+            "en": "Does Scripture describe the Holy Spirit as a person equal to the Father and the Son — or as God’s power and activity?"
+          },
+          "author": {
+            "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+            "displayName": "Anna"
+          },
+          "createdAt": "2026-09-28T11:00:00.000Z",
+          "updatedAt": "<iso8601>",
+          "tally": {
+            "users": {
+              "pro": 3,
+              "con": 1,
+              "none": 0,
+              "open": 1
+            },
+            "ai": {
+              "pro": 0,
+              "con": 0,
+              "none": 4,
+              "open": 1
+            },
+            "aiStatus": "fresh"
+          }
+        }
+      }
+    }
+  ]
+}

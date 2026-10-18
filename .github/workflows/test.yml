@@ -1,0 +1,55 @@
+name: test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: npm ci
+      - run: npm run check
+      - name: No external references in the page
+        run: "! grep -E '<script[^>]+src=|<link[^>]+href=\"https?:' build/html-bible.html"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: html-bible
+          path: |
+            build/html-bible.html
+            build/pages/
+
+  # The demo on GitHub Pages: the same page built with config/build.demo.json —
+  # it downloads nothing (the texts are not in git) and has no server; the
+  # user opens translation files from disk. Needs Settings → Pages → Source:
+  # GitHub Actions.
+  demo:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: node build.mjs --config config/build.demo.json
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/pages
+      - id: deployment
+        uses: actions/deploy-pages@v4

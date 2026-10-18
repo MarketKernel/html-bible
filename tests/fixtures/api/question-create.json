@@ -1,0 +1,80 @@
+{
+  "name": "question-create",
+  "description": "Create a topic. Text fields are plain strings in the language named by \"lang\"; the response has both languages.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/questions",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "lang": "en",
+          "title": "Is baptism necessary for salvation?",
+          "summaryMd": "Weigh the **texts** on both sides.",
+          "sides": {
+            "pro": "Necessary",
+            "con": "Not necessary"
+          },
+          "tags": [
+            "baptism",
+            "Salvation"
+          ]
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "id": "<ulid>",
+          "title": {
+            "orig": "en",
+            "ru": "[auto-translated en→ru] Is baptism necessary for salvation?",
+            "en": "Is baptism necessary for salvation?"
+          },
+          "summaryMd": {
+            "orig": "en",
+            "ru": "[auto-translated en→ru] Weigh the **texts** on both sides.",
+            "en": "Weigh the **texts** on both sides."
+          },
+          "sides": {
+            "pro": {
+              "orig": "en",
+              "ru": "[auto-translated en→ru] Necessary",
+              "en": "Necessary"
+            },
+            "con": {
+              "orig": "en",
+              "ru": "[auto-translated en→ru] Not necessary",
+              "en": "Not necessary"
+            }
+          },
+          "tags": [
+            "baptism",
+            "salvation"
+          ],
+          "author": {
+            "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
+            "displayName": "Elena"
+          },
+          "createdAt": "<iso8601>",
+          "tally": {
+            "users": {
+              "pro": 0,
+              "con": 0,
+              "none": 0,
+              "open": 0
+            },
+            "ai": {
+              "pro": 0,
+              "con": 0,
+              "none": 0,
+              "open": 0
+            },
+            "aiStatus": "none"
+          }
+        }
+      }
+    }
+  ]
+}

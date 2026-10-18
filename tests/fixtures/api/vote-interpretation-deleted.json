@@ -1,0 +1,43 @@
+{
+  "name": "vote-interpretation-deleted",
+  "description": "A soft-deleted interpretation cannot be rated: 409 deleted.",
+  "steps": [
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/v1/interpretations/01JAS000000000000000000T02",
+        "headers": {
+          "Authorization": "Bearer <jwt:david>"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "01JAS000000000000000000T02",
+          "deleted": "soft"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/votes/interpretation/01JAS000000000000000000T02",
+        "headers": {
+          "Authorization": "Bearer <jwt:sarah>"
+        },
+        "body": {
+          "value": 1
+        }
+      },
+      "response": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "deleted",
+            "message": "This item was deleted by its author"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "verse-tags-noncanonical",
+  "description": "Tags exist only for canonical books.",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/verse-tags?book=TOB&chapter=1"
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "noncanonical_ref",
+            "message": "TOB is not a canonical book; discussions only cite the 66 canonical books",
+            "field": "book"
+          }
+        }
+      }
+    }
+  ]
+}

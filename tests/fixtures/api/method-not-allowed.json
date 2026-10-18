@@ -1,0 +1,21 @@
+{
+  "name": "method-not-allowed",
+  "description": "A known path with the wrong method: 405 with an Allow header.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/health"
+      },
+      "response": {
+        "status": 405,
+        "body": {
+          "error": {
+            "code": "method_not_allowed",
+            "message": "Use GET on this path"
+          }
+        }
+      }
+    }
+  ]
+}

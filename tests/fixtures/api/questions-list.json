@@ -1,0 +1,71 @@
+{
+  "name": "questions-list",
+  "description": "All topics, newest first, with tallies and counts.",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/questions?lang=en"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "questions": [
+            {
+              "id": "01JAS000000000000000000Q01",
+              "title": {
+                "orig": "ru",
+                "ru": "Соответствует ли учение о Троице Библии?",
+                "en": "Is the doctrine of the Trinity consistent with the Bible?"
+              },
+              "summaryMd": {
+                "orig": "ru",
+                "ru": "Учение о Троице утверждает, что один Бог существует в трёх лицах — Отце, Сыне и Святом Духе. В каждой подтеме собраны стихи, на которые ссылаются обе стороны; голосуйте, какую позицию подтверждает стих, и объясняйте своё прочтение в колонке своей позиции.\n\nУважайте собеседников: по этому вопросу искренние христиане приходят к разным выводам.",
+                "en": "The doctrine of the Trinity holds that one God exists in three persons — the Father, the Son and the Holy Spirit. Each subtopic collects verses that both sides cite; vote on which position a verse supports, and explain your reading in your position's column.\n\nBe respectful: sincere Christians reach different conclusions on this question."
+              },
+              "sides": {
+                "pro": {
+                  "orig": "ru",
+                  "ru": "Соответствует",
+                  "en": "Consistent"
+                },
+                "con": {
+                  "orig": "ru",
+                  "ru": "Не соответствует",
+                  "en": "Not consistent"
+                }
+              },
+              "tags": [
+                "trinity",
+                "christology",
+                "holy-spirit"
+              ],
+              "author": {
+                "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+                "displayName": "Anna"
+              },
+              "createdAt": "2026-09-28T09:00:00.000Z",
+              "tally": {
+                "users": {
+                  "pro": 7,
+                  "con": 6,
+                  "none": 1,
+                  "open": 3
+                },
+                "ai": {
+                  "pro": 3,
+                  "con": 2,
+                  "none": 10,
+                  "open": 2
+                },
+                "aiStatus": "fresh"
+              },
+              "argumentCount": 3,
+              "verseCount": 17
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

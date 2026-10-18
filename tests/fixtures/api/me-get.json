@@ -1,0 +1,24 @@
+{
+  "name": "me-get",
+  "description": "The signed-in user's profile (created on the first authenticated request).",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/me",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
+          "provider": "apple",
+          "displayName": "Elena",
+          "createdAt": "2026-09-29T10:00:00.000Z"
+        }
+      }
+    }
+  ]
+}

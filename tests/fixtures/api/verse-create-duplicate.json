@@ -1,0 +1,32 @@
+{
+  "name": "verse-create-duplicate",
+  "description": "The same range twice in one subtopic: 409 duplicate_verse with the id of the existing verse.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/arguments/01JAS000000000000000000A01/verses",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "ref": {
+            "from": "JHN.1.1",
+            "to": "JHN.1.1"
+          }
+        }
+      },
+      "response": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "duplicate_verse",
+            "message": "This verse is already in the subtopic",
+            "field": "ref",
+            "id": "01JAS000000000000000000V01"
+          }
+        }
+      }
+    }
+  ]
+}

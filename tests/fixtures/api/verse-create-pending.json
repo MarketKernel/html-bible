@@ -1,0 +1,55 @@
+{
+  "name": "verse-create-pending",
+  "description": "With --eval-delay a new verse is \"pending\" with no verdicts until the evaluation finishes; poll GET /v1/verses/{id}/rating every 3 s.",
+  "server": {
+    "evalDelay": 30
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/arguments/01JAS000000000000000000A03/verses",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "ref": {
+            "from": "ISA.9.6",
+            "to": "ISA.9.6"
+          }
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "id": "<ulid>",
+          "argumentId": "01JAS000000000000000000A03",
+          "questionId": "01JAS000000000000000000Q01",
+          "ref": {
+            "from": "ISA.9.6",
+            "to": "ISA.9.6"
+          },
+          "author": {
+            "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
+            "displayName": "Elena"
+          },
+          "createdAt": "<iso8601>",
+          "votes": {
+            "pro": 0,
+            "con": 0,
+            "none": 0,
+            "mine": null
+          },
+          "users": {
+            "outcome": null
+          },
+          "ai": {
+            "outcome": null,
+            "status": "pending",
+            "verdicts": []
+          }
+        }
+      }
+    }
+  ]
+}

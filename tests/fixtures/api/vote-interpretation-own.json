@@ -1,0 +1,27 @@
+{
+  "name": "vote-interpretation-own",
+  "description": "Nobody rates their own interpretation: 403 own_item.",
+  "steps": [
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/votes/interpretation/01JAS000000000000000000T01",
+        "headers": {
+          "Authorization": "Bearer <jwt:anna>"
+        },
+        "body": {
+          "value": 1
+        }
+      },
+      "response": {
+        "status": 403,
+        "body": {
+          "error": {
+            "code": "own_item",
+            "message": "You cannot rate your own interpretation"
+          }
+        }
+      }
+    }
+  ]
+}

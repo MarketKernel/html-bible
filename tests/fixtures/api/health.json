@@ -1,0 +1,19 @@
+{
+  "name": "health",
+  "description": "Liveness probe; the client treats the API as reachable when this answers.",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/health"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "version": "0.1.0-stub"
+        }
+      }
+    }
+  ]
+}

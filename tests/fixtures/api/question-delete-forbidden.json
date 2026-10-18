@@ -1,0 +1,24 @@
+{
+  "name": "question-delete-forbidden",
+  "description": "Only the author may edit or delete: 403 forbidden.",
+  "steps": [
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/v1/questions/01JAS000000000000000000Q01",
+        "headers": {
+          "Authorization": "Bearer <jwt:david>"
+        }
+      },
+      "response": {
+        "status": 403,
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "Only the author can do this"
+          }
+        }
+      }
+    }
+  ]
+}

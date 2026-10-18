@@ -1,0 +1,28 @@
+{
+  "name": "vote-interpretation-remove",
+  "description": "null removes the caller's rating.",
+  "steps": [
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/votes/interpretation/01JAS000000000000000000T01",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "value": null
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "votes": {
+            "up": 1,
+            "down": 1,
+            "mine": null
+          }
+        }
+      }
+    }
+  ]
+}

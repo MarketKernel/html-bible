@@ -1,0 +1,40 @@
+# Generated
+build/
+
+# The texts: built by tools/translations and tools/commentaries from
+# private/sources/, published on the site (build_scripts/cloudflare.sh), not
+# kept in git. data/meta/ is small and the server needs it.
+data/*
+!data/meta/
+shots/
+server/.data/
+*.tsbuildinfo
+coverage/
+
+# Dependencies
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local and private
+private/
+.env
+.env.*
+*.log
+npm-debug.log*
+
+# Spec and assistant files
+Task.md
+CLAUDE.md
+.claude/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

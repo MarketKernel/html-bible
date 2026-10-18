@@ -1,0 +1,26 @@
+{
+  "name": "oauth-token-invalid-grant",
+  "description": "Token endpoint errors use the OAuth format (like Cognito), not the API one.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/oauth2/token",
+        "form": {
+          "grant_type": "authorization_code",
+          "client_id": "html-bible-dev",
+          "code": "no-such-code",
+          "redirect_uri": "http://localhost:8787/",
+          "code_verifier": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "invalid_grant",
+          "error_description": "Unknown authorization code"
+        }
+      }
+    }
+  ]
+}

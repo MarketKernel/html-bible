@@ -1,0 +1,27 @@
+{
+  "name": "vote-removed-target",
+  "description": "Votes on points, arguments and questions no longer exist: 404.",
+  "steps": [
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/votes/question/01JAS000000000000000000Q01",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "value": 1
+        }
+      },
+      "response": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "No such route"
+          }
+        }
+      }
+    }
+  ]
+}

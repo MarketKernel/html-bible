@@ -1,0 +1,20 @@
+{
+  "format": "html-bible/commentary",
+  "formatVersion": 1,
+  "id": "ru-lopukhin",
+  "version": "1.0.0",
+  "lang": "ru",
+  "name": "Толковая Библия Лопухина",
+  "versification": "synodal",
+  "license": "Public domain",
+  "source": "https://mybible.zone/repository/modules/%D0%9B%D0%BE%D0%BF-%D0%BA.commentaries.zip",
+  "books": [
+    {
+      "id": "JHN",
+      "url": "JHN.json.gz",
+      "bytes": 17323,
+      "sha256": "bda69d74f6c9746043be7de8b2acfaebf0a75c5310901535962c32d819b643f5",
+      "entries": 35
+    }
+  ]
+}

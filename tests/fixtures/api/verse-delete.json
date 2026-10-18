@@ -1,0 +1,174 @@
+{
+  "name": "verse-delete",
+  "description": "Remove your own verse while nobody else has voted and it has no interpretations (your own vote does not count).",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/arguments/01JAS000000000000000000A01/verses",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "ref": {
+            "from": "JHN.8.58",
+            "to": "JHN.8.58"
+          }
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "id": "<ulid>",
+          "argumentId": "01JAS000000000000000000A01",
+          "questionId": "01JAS000000000000000000Q01",
+          "ref": {
+            "from": "JHN.8.58",
+            "to": "JHN.8.58"
+          },
+          "author": {
+            "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
+            "displayName": "Elena"
+          },
+          "createdAt": "<iso8601>",
+          "votes": {
+            "pro": 0,
+            "con": 0,
+            "none": 0,
+            "mine": null
+          },
+          "users": {
+            "outcome": null
+          },
+          "ai": {
+            "outcome": 0,
+            "status": "fresh",
+            "verdicts": [
+              {
+                "verseId": "<ulid>",
+                "model": "openai-stub-mini",
+                "value": 0,
+                "confidence": 0.3,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-mini** (заглушка) прочла толкований за «Не соответствует»: 0 (0 знаков), за «Соответствует»: 0 (0 знаков): толкований пока нет, поэтому стих пока считается не относящимся к теме.",
+                  "en": "**openai-stub-mini** (stub) read 0 interpretation(s) for “Not consistent” (0 characters) and 0 for “Consistent” (0 characters): nobody has explained the verse yet, so it counts as not relevant for now."
+                },
+                "inputHash": "<sha256>",
+                "createdAt": "<iso8601>"
+              },
+              {
+                "verseId": "<ulid>",
+                "model": "openai-stub-large",
+                "value": 0,
+                "confidence": 0.3,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-large** (заглушка) прочла толкований за «Не соответствует»: 0 (0 знаков), за «Соответствует»: 0 (0 знаков): толкований пока нет, поэтому стих пока считается не относящимся к теме.",
+                  "en": "**openai-stub-large** (stub) read 0 interpretation(s) for “Not consistent” (0 characters) and 0 for “Consistent” (0 characters): nobody has explained the verse yet, so it counts as not relevant for now."
+                },
+                "inputHash": "<sha256>",
+                "createdAt": "<iso8601>"
+              }
+            ]
+          }
+        }
+      },
+      "save": {
+        "newVerse": "id"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/votes/verse/{newVerse}",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "value": 1
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "votes": {
+            "pro": 1,
+            "con": 0,
+            "none": 0,
+            "mine": 1
+          },
+          "users": {
+            "outcome": 1
+          },
+          "argument": {
+            "id": "01JAS000000000000000000A01",
+            "tally": {
+              "users": {
+                "pro": 5,
+                "con": 2,
+                "none": 0,
+                "open": 1
+              },
+              "ai": {
+                "pro": 2,
+                "con": 1,
+                "none": 4,
+                "open": 1
+              },
+              "aiStatus": "fresh"
+            }
+          },
+          "question": {
+            "id": "01JAS000000000000000000Q01",
+            "tally": {
+              "users": {
+                "pro": 8,
+                "con": 6,
+                "none": 1,
+                "open": 3
+              },
+              "ai": {
+                "pro": 3,
+                "con": 2,
+                "none": 11,
+                "open": 2
+              },
+              "aiStatus": "fresh"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/v1/verses/{newVerse}",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "<ulid>",
+          "deleted": "hard"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/verse-tags?book=JHN&chapter=8"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "book": "JHN",
+          "chapter": 8,
+          "tags": []
+        }
+      }
+    }
+  ]
+}

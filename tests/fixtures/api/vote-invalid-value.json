@@ -1,0 +1,28 @@
+{
+  "name": "vote-invalid-value",
+  "description": "Only 1, -1, 0 or null.",
+  "steps": [
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/votes/verse/01JAS000000000000000000V01",
+        "headers": {
+          "Authorization": "Bearer <jwt:elena>"
+        },
+        "body": {
+          "value": 2
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"value\" must be 1, -1, 0 or null",
+            "field": "value"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "verse-delete-in-use",
+  "description": "A verse others voted on, or one with interpretations, stays: 409 in_use.",
+  "steps": [
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/v1/verses/01JAS000000000000000000V01",
+        "headers": {
+          "Authorization": "Bearer <jwt:anna>"
+        }
+      },
+      "response": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "in_use",
+            "message": "Others have voted on this verse; it can no longer be removed"
+          }
+        }
+      }
+    }
+  ]
+}

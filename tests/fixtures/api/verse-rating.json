@@ -1,0 +1,93 @@
+{
+  "name": "verse-rating",
+  "description": "What the client polls while ai.status is \"pending\": the verse's votes and outcomes plus its subtopic's and topic's tallies.",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/verses/01JAS000000000000000000V07/rating"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "votes": {
+            "pro": 1,
+            "con": 3,
+            "none": 0
+          },
+          "users": {
+            "outcome": -1
+          },
+          "ai": {
+            "outcome": -1,
+            "status": "fresh",
+            "verdicts": [
+              {
+                "verseId": "01JAS000000000000000000V07",
+                "model": "openai-stub-mini",
+                "value": -1,
+                "confidence": 0.6,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-mini** (заглушка) прочла толкований за «Не соответствует»: 2 (249 знаков), за «Соответствует»: 1 (189 знаков): стих подтверждает позицию «Не соответствует».",
+                  "en": "**openai-stub-mini** (stub) read 2 interpretation(s) for “Not consistent” (249 characters) and 1 for “Consistent” (189 characters): the verse supports “Not consistent”."
+                },
+                "inputHash": "4d41db77a97fd7a6f18255d2ff7e44eb82dfdc41b7ea583ad1d4e4db9ba5a4d9",
+                "createdAt": "2026-10-01T09:00:00.000Z"
+              },
+              {
+                "verseId": "01JAS000000000000000000V07",
+                "model": "openai-stub-large",
+                "value": -1,
+                "confidence": 0.8,
+                "rationaleMd": {
+                  "orig": "en",
+                  "ru": "**openai-stub-large** (заглушка) прочла толкований за «Не соответствует»: 2 (249 знаков), за «Соответствует»: 1 (189 знаков): стих подтверждает позицию «Не соответствует».",
+                  "en": "**openai-stub-large** (stub) read 2 interpretation(s) for “Not consistent” (249 characters) and 1 for “Consistent” (189 characters): the verse supports “Not consistent”."
+                },
+                "inputHash": "4d41db77a97fd7a6f18255d2ff7e44eb82dfdc41b7ea583ad1d4e4db9ba5a4d9",
+                "createdAt": "2026-10-01T09:00:00.000Z"
+              }
+            ]
+          },
+          "argument": {
+            "id": "01JAS000000000000000000A01",
+            "tally": {
+              "users": {
+                "pro": 4,
+                "con": 2,
+                "none": 0,
+                "open": 1
+              },
+              "ai": {
+                "pro": 2,
+                "con": 1,
+                "none": 3,
+                "open": 1
+              },
+              "aiStatus": "fresh"
+            }
+          },
+          "question": {
+            "id": "01JAS000000000000000000Q01",
+            "tally": {
+              "users": {
+                "pro": 7,
+                "con": 6,
+                "none": 1,
+                "open": 3
+              },
+              "ai": {
+                "pro": 3,
+                "con": 2,
+                "none": 10,
+                "open": 2
+              },
+              "aiStatus": "fresh"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

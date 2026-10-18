@@ -1,0 +1,45 @@
+{
+  "name": "interpretation-patch",
+  "description": "Edit your own interpretation: re-translation and re-evaluation; side and replyTo cannot change.",
+  "steps": [
+    {
+      "request": {
+        "method": "PATCH",
+        "path": "/v1/interpretations/01JAS000000000000000000T01",
+        "headers": {
+          "Authorization": "Bearer <jwt:anna>"
+        },
+        "body": {
+          "lang": "en",
+          "bodyMd": "The Word is “with God” and “was God”."
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "01JAS000000000000000000T01",
+          "verseId": "01JAS000000000000000000V01",
+          "argumentId": "01JAS000000000000000000A01",
+          "questionId": "01JAS000000000000000000Q01",
+          "side": "pro",
+          "bodyMd": {
+            "orig": "en",
+            "ru": "[auto-translated en→ru] The Word is “with God” and “was God”.",
+            "en": "The Word is “with God” and “was God”."
+          },
+          "author": {
+            "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+            "displayName": "Anna"
+          },
+          "createdAt": "2026-09-28T13:00:00.000Z",
+          "updatedAt": "<iso8601>",
+          "votes": {
+            "up": 2,
+            "down": 1,
+            "mine": null
+          }
+        }
+      }
+    }
+  ]
+}

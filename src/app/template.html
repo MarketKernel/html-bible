@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<!-- viewport-fit=cover hands the notch and the home indicator to env(safe-area-inset-*);
+     resizes-content makes Chrome on Android shrink the page, not cover it, with the keyboard. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<!-- The build fills script-src with the hash of the one script below and connect-src with the
+     configured data, API and sign-in origins. Images from https: are what comment and discussion
+     authors link to; the page itself loads nothing from elsewhere. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src https: data: blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Bible</title>
+<link rel="icon" href="__ICON__">
+<style>/*__STYLES__*/</style>
+</head>
+<body>
+<div id="app" class="app">
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Bible"><img src="__ICON__" alt="" width="28" height="28"></a>
+    <nav class="tabs" role="tablist">
+      <button type="button" class="tab" id="tab-bible" role="tab" data-i18n="tabs">Bible</button>
+      <button type="button" class="tab" id="tab-discussions" role="tab" data-i18n="tabs">Discussions</button>
+    </nav>
+    <div class="search-box">
+      <input id="search-input" type="search" autocomplete="off" spellcheck="false" enterkeyhint="search"
+             placeholder="Search or John 3:16" data-i18n-attr="search" aria-label="Search or John 3:16">
+    </div>
+    <button type="button" class="icon-button" id="account-button" title="Account" data-i18n-attr="topbar" aria-label="Account"></button>
+    <button type="button" class="icon-button" id="menu-button" title="Menu" data-i18n-attr="topbar" aria-label="Menu"></button>
+  </header>
+  <main id="main" class="main">
+    <div class="boot" id="boot"><img src="__ICON__" alt="" width="56" height="56"></div>
+  </main>
+</div>
+<div id="selection-bar" class="selection-bar" hidden></div>
+<div id="layer"></div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<script>/*__APP__*/</script>
+</body>
+</html>
