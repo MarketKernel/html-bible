@@ -1,6 +1,6 @@
 {
   "name": "invalid-token",
-  "description": "A malformed, forged or foreign token: 401 invalid_token (an expired one gives token_expired).",
+  "description": "A malformed, unknown or revoked token: 401 invalid_token, even on reads.",
   "steps": [
     {
       "request": {

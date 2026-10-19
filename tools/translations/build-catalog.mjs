@@ -9,8 +9,8 @@
  *   node tools/translations/build-catalog.mjs
  *   node tools/translations/build-catalog.mjs DIR    the same for another folder (the test data)
  *
- * Run after any converter (build-kjv.mjs, build-synodal.mjs,
- * tools/commentaries/lopukhin.py) has rewritten a file.
+ * Run after any converter (build-kjv.mjs, build-synodal.mjs, build-ebible.mjs,
+ * build-ogienko.mjs, tools/commentaries/lopukhin.py) has rewritten a file.
  */
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -41,6 +41,12 @@ for (const name of readdirSync(dir).filter((n) => /\.json(\.gz)?$/.test(n)).sort
     license: t.license,
   });
 }
+
+// The first translation in the reader's language is what a new reader is
+// offered, so the KJV and the Synodal go before the others of their language.
+const FIRST = ['en-kjv', 'ru-synodal'];
+const rank = (t) => (FIRST.includes(t.id) ? FIRST.indexOf(t.id) : FIRST.length);
+translations.sort((a, b) => rank(a) - rank(b));
 
 const linkNames = new Set();
 for (const t of translations) {

@@ -8,7 +8,8 @@
  * Psalm titles (\d) are not verses in USFM; the caller decides what to do with
  * them, so they come back separately per chapter.
  *
- * Not a CLI: imported by the converters (build-kjv.mjs, build-synodal.mjs).
+ * Not a CLI: imported by the converters (build-kjv.mjs, build-ebible.mjs,
+ * build-synodal.mjs, build-ogienko.mjs).
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -58,6 +59,50 @@ export function normalizeSpace(text) {
     .replace(/ \]/g, ']')
     .replace(/ ([,.;:!?])/g, '$1')
     .trim();
+}
+
+/**
+ * Makes every verse of a chapter balanced in [ ], in place, since the reader
+ * shows and hides added words one verse at a time. A bracket closed in a later
+ * verse is closed at the end of each verse and reopened in the next — unless
+ * `across` is false, for editions whose brackets over several verses mark a
+ * doubtful passage, not added words: then both ends are dropped. A bracket
+ * never closed, or a closing one never opened, is dropped. Returns the verse
+ * numbers of each case, for the converter's report.
+ */
+export function balanceChapter(verses, { across = true } = {}) {
+  const report = { spanning: [], stray: [], unopened: [] };
+  let carry = false;
+  for (let v = 0; v < verses.length; v += 1) {
+    let text = carry ? `[${verses[v]}` : verses[v];
+    carry = false;
+    let depth = 0;
+    let kept = '';
+    for (const ch of text) {
+      if (ch === ']' && depth === 0) {
+        report.unopened.push(v + 1);
+        continue;
+      }
+      depth += ch === '[' ? 1 : ch === ']' ? -1 : 0;
+      kept += ch;
+    }
+    text = kept;
+    if (depth > 0) {
+      // Closed later in the chapter? Then close here and reopen next verse.
+      const rest = verses.slice(v + 1).join(' ');
+      if (across && rest.indexOf(']') >= 0 && (rest.indexOf('[') < 0 || rest.indexOf(']') < rest.indexOf('['))) {
+        report.spanning.push(v + 1);
+        text = `${text}]`;
+        carry = true;
+      } else {
+        const at = text.lastIndexOf('[');
+        text = text.slice(0, at) + text.slice(at + 1);
+        report.stray.push(v + 1);
+      }
+    }
+    verses[v] = normalizeSpace(text.replace(/\[\]/g, ''));
+  }
+  return report;
 }
 
 /**

@@ -1,0 +1,119 @@
+{
+  "name": "invite-used",
+  "description": "A code works once: 409 invite_used after that, and the owner sees who used it.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/invites",
+        "headers": {
+          "Authorization": "Bearer <token:anna>"
+        }
+      },
+      "save": {
+        "code": "code"
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "seq": 1,
+          "code": "2-1-PHFF6-7X471"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "invite": "{code}",
+          "login": "olga",
+          "password": "olga's password"
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "token": "<token>",
+          "user": {
+            "id": "<uuid>",
+            "number": 7,
+            "login": "olga",
+            "displayName": "olga",
+            "createdAt": "<iso8601>",
+            "invitedBy": {
+              "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+              "displayName": "Anna"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "invite": "{code}",
+          "login": "olga2",
+          "password": "olga's password"
+        }
+      },
+      "response": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "invite_used",
+            "message": "This invitation code has been used",
+            "field": "invite"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/invites/{code}"
+      },
+      "response": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "invite_used",
+            "message": "This invitation code has been used",
+            "field": "invite"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/invites",
+        "headers": {
+          "Authorization": "Bearer <token:anna>"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "issued": 1,
+          "limit": 10,
+          "resetOn": null,
+          "available": 9,
+          "codes": [
+            {
+              "seq": 1,
+              "code": "2-1-PHFF6-7X471",
+              "usedBy": {
+                "id": "<uuid>",
+                "displayName": "olga",
+                "at": "<iso8601>"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

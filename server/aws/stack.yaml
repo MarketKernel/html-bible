@@ -1,0 +1,395 @@
+# The discussions API in AWS (docs/deploy.md): the Rust binary
+# (server/src/bin/lambda.rs) as two Lambdas — the API behind an HTTP API on
+# api.bible.marketkernel.com, and the evaluator it starts without waiting —
+# DynamoDB on demand, OpenAI's models. Deployed by build_scripts/aws.sh.
+#
+# Made by hand, outside this stack: the ACM certificate and the API Gateway
+# custom domain (DomainName), which this stack only maps its API onto.
+#
+# The tables are retained when the stack is deleted or a table would be
+# replaced: the data outlives any mistake in this file.
+AWSTemplateFormatVersion: '2010-09-09'
+Description: html-bible discussions API - one Lambda behind an HTTP API, DynamoDB
+
+Parameters:
+  CodeBucket:
+    Type: String
+  CodeKey:
+    Type: String
+  DomainName:
+    Type: String
+    Default: api.bible.marketkernel.com
+  SiteOrigins:
+    Type: String
+    Description: Sites allowed by CORS (comma-separated); file:// and localhost always are
+    Default: https://bible.marketkernel.com
+  TablePrefix:
+    Type: String
+    Default: html-bible-
+  InviteKeyParameter:
+    Type: String
+    Description: The SSM SecureString with the key of invitation codes (made by build_scripts/aws.sh)
+    Default: /html-bible/invite-key
+  OpenAiKeyParameter:
+    Type: String
+    Description: The SSM SecureString with the OpenAI API key (put there by hand)
+    Default: /html-bible/openai-key
+  ReviewModel:
+    Type: String
+    Description: Checks and translates what is saved, while the author waits
+    Default: gpt-5.4-mini
+  EvalModel:
+    Type: String
+    Description: Evaluates verses, after the response
+    Default: gpt-5.5
+
+Resources:
+  # ------------------------------------------------------------ tables
+  # Keyed by "id"; a GSI per field the code queries (store.rs, dynamo.rs).
+
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}users'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: id, AttributeType: S }
+        - { AttributeName: invitedBy, AttributeType: S }
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+      GlobalSecondaryIndexes:
+        - IndexName: invitedBy
+          KeySchema: [{ AttributeName: invitedBy, KeyType: HASH }]
+          Projection: { ProjectionType: ALL }
+
+  # member number → user (unique numbers; the inviter of a code)
+  NumbersTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}numbers'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: id, AttributeType: S }]
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+
+  # Used invitation codes ("<number>:<seq>"): the codes themselves are never stored.
+  InvitesTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}invites'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: id, AttributeType: S }]
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+
+  LoginsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}logins'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: id, AttributeType: S }]
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+
+  SessionsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}sessions'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: id, AttributeType: S }
+        - { AttributeName: userId, AttributeType: S }
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+      GlobalSecondaryIndexes:
+        - IndexName: userId
+          KeySchema: [{ AttributeName: userId, KeyType: HASH }]
+          Projection: { ProjectionType: ALL }
+
+  ThrottleTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}throttle'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: id, AttributeType: S }]
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+
+  QuestionsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}questions'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: id, AttributeType: S }]
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+
+  ArgumentsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}arguments'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: id, AttributeType: S }
+        - { AttributeName: questionId, AttributeType: S }
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+      GlobalSecondaryIndexes:
+        - IndexName: questionId
+          KeySchema: [{ AttributeName: questionId, KeyType: HASH }]
+          Projection: { ProjectionType: ALL }
+
+  VersesTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}verses'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: id, AttributeType: S }
+        - { AttributeName: argumentId, AttributeType: S }
+        - { AttributeName: questionId, AttributeType: S }
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+      GlobalSecondaryIndexes:
+        - IndexName: argumentId
+          KeySchema: [{ AttributeName: argumentId, KeyType: HASH }]
+          Projection: { ProjectionType: ALL }
+        - IndexName: questionId
+          KeySchema: [{ AttributeName: questionId, KeyType: HASH }]
+          Projection: { ProjectionType: ALL }
+
+  InterpretationsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}interpretations'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: id, AttributeType: S }
+        - { AttributeName: verseId, AttributeType: S }
+        - { AttributeName: questionId, AttributeType: S }
+        - { AttributeName: replyTo, AttributeType: S }
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+      GlobalSecondaryIndexes:
+        - IndexName: verseId
+          KeySchema: [{ AttributeName: verseId, KeyType: HASH }]
+          Projection: { ProjectionType: ALL }
+        - IndexName: questionId
+          KeySchema: [{ AttributeName: questionId, KeyType: HASH }]
+          Projection: { ProjectionType: ALL }
+        - IndexName: replyTo
+          KeySchema: [{ AttributeName: replyTo, KeyType: HASH }]
+          Projection: { ProjectionType: ALL }
+
+  VotesTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}votes'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: id, AttributeType: S }
+        - { AttributeName: targetKey, AttributeType: S }
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+      GlobalSecondaryIndexes:
+        - IndexName: targetKey
+          KeySchema: [{ AttributeName: targetKey, KeyType: HASH }]
+          Projection: { ProjectionType: ALL }
+
+  VerdictsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}verdicts'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: id, AttributeType: S }]
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+
+  MetaTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}meta'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: id, AttributeType: S }]
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+
+  # ------------------------------------------------------------ the Lambda
+
+  ApiLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/html-bible-api
+      RetentionInDays: 14
+
+  EvaluatorLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/html-bible-evaluator
+      RetentionInDays: 14
+
+  ApiRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: api
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: [!GetAtt ApiLogs.Arn, !GetAtt EvaluatorLogs.Arn]
+              # The tables of this prefix and their indexes ("…/index/…" matches the *).
+              - Effect: Allow
+                Action: [dynamodb:GetItem, dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:DeleteItem, dynamodb:Query, dynamodb:Scan]
+                Resource: !Sub 'arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TablePrefix}*'
+              # The two keys, and nothing else in SSM.
+              - Effect: Allow
+                Action: ssm:GetParameter
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${InviteKeyParameter}'
+                  - !Sub 'arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${OpenAiKeyParameter}'
+              # The API starts the evaluator (by name: the role must not wait for the function).
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:html-bible-evaluator'
+
+  ApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: html-bible-api
+      Description: html-bible discussions API (server/, Rust)
+      Runtime: provided.al2023
+      Architectures: [arm64]
+      Handler: bootstrap
+      Code:
+        S3Bucket: !Ref CodeBucket
+        S3Key: !Ref CodeKey
+      MemorySize: 128
+      # A save waits for the review model (about 2 s); HTTP APIs wait 30 s at most.
+      Timeout: 28
+      Role: !GetAtt ApiRole.Arn
+      LoggingConfig:
+        LogGroup: !Ref ApiLogs
+      Environment:
+        Variables:
+          BIBLE_TABLE_PREFIX: !Ref TablePrefix
+          BIBLE_SITE_ORIGINS: !Ref SiteOrigins
+          BIBLE_INVITE_KEY_PARAMETER: !Ref InviteKeyParameter
+          BIBLE_OPENAI_KEY_PARAMETER: !Ref OpenAiKeyParameter
+          BIBLE_REVIEW_MODEL: !Ref ReviewModel
+          BIBLE_EVAL_MODEL: !Ref EvalModel
+          BIBLE_EVALUATOR_FUNCTION: html-bible-evaluator
+
+  # The same binary: it sees { "evaluate": "<verse id>" } and judges the verse.
+  EvaluatorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: html-bible-evaluator
+      Description: html-bible verse evaluation (server/, Rust), started by the API without waiting
+      Runtime: provided.al2023
+      Architectures: [arm64]
+      Handler: bootstrap
+      Code:
+        S3Bucket: !Ref CodeBucket
+        S3Key: !Ref CodeKey
+      MemorySize: 128
+      Timeout: 120
+      Role: !GetAtt ApiRole.Arn
+      LoggingConfig:
+        LogGroup: !Ref EvaluatorLogs
+      Environment:
+        Variables:
+          BIBLE_TABLE_PREFIX: !Ref TablePrefix
+          BIBLE_INVITE_KEY_PARAMETER: !Ref InviteKeyParameter
+          BIBLE_OPENAI_KEY_PARAMETER: !Ref OpenAiKeyParameter
+          BIBLE_REVIEW_MODEL: !Ref ReviewModel
+          BIBLE_EVAL_MODEL: !Ref EvalModel
+
+  # A failed evaluation is tried once more; the verse keeps its last verdicts meanwhile.
+  EvaluatorRetries:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      FunctionName: !Ref EvaluatorFunction
+      Qualifier: $LATEST
+      MaximumRetryAttempts: 1
+      MaximumEventAgeInSeconds: 3600
+
+  # ------------------------------------------------------------ the HTTP API
+  # Only $default: routing, sign-in and CORS are the code's (router.rs), so
+  # API Gateway has no authorizer and no CORS settings of its own.
+
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: html-bible-api
+      ProtocolType: HTTP
+
+  Integration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt ApiFunction.Arn
+      PayloadFormatVersion: '2.0'
+      TimeoutInMillis: 29000
+
+  DefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: $default
+      Target: !Sub 'integrations/${Integration}'
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: $default
+      AutoDeploy: true
+      # A cap on requests is the cap on the bill: no one can make it run up.
+      DefaultRouteSettings:
+        ThrottlingRateLimit: 10
+        ThrottlingBurstLimit: 20
+
+  InvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ApiFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*'
+
+  Mapping:
+    Type: AWS::ApiGatewayV2::ApiMapping
+    DependsOn: DefaultRoute
+    Properties:
+      DomainName: !Ref DomainName
+      ApiId: !Ref HttpApi
+      Stage: !Ref Stage
+
+Outputs:
+  ApiEndpoint:
+    Description: The API's own address (the custom domain points here)
+    Value: !GetAtt HttpApi.ApiEndpoint
+  Function:
+    Value: !Ref ApiFunction

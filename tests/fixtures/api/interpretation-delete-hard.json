@@ -7,7 +7,7 @@
         "method": "DELETE",
         "path": "/v1/interpretations/01JAS000000000000000000T04",
         "headers": {
-          "Authorization": "Bearer <jwt:anna>"
+          "Authorization": "Bearer <token:anna>"
         }
       },
       "response": {

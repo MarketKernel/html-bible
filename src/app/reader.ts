@@ -350,7 +350,8 @@ function copyText(ref: ParsedRef): string {
   const { tr, book, chapter } = state;
   const verses = [...state.selected].sort((a, b) => a - b);
   const lang = (tr.lang === 'ru' ? 'ru' : 'en') as 'ru' | 'en';
-  const label = `${formatHuman(ref, lang)}, ${tr.shortName}`;
+  // The translation's own short name: books.ts has no Ukrainian ones.
+  const label = `${formatHuman(ref, lang, 'short', tr.lang === 'ru' || tr.lang === 'en' ? undefined : tr.books.find((b) => b.id === book)?.short)}, ${tr.shortName}`;
   const clean = (text: string) => (settings.addedWords === 'hidden' ? text.replace(/\s*\[[^\]]*\]/g, '') : text.replace(/[[\]]/g, ''));
   const texts = verses.map((v) => clean(verseText(tr, { book, chapter, verse: v }) ?? ''));
   let out: string;

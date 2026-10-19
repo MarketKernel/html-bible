@@ -1,0 +1,84 @@
+{
+  "name": "users-get",
+  "description": "A public profile: name, number, when, who invited and whom — never the login or the codes.",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/users/2764d8bf-5142-5be3-b585-4991ff43a045"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+          "number": 2,
+          "displayName": "Anna",
+          "createdAt": "2026-09-28T08:00:00.000Z",
+          "invitedBy": {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "displayName": "root"
+          },
+          "invitees": []
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/users/00000000-0000-4000-8000-000000000001"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "00000000-0000-4000-8000-000000000001",
+          "number": 1,
+          "displayName": "root",
+          "createdAt": "2026-09-28T07:00:00.000Z",
+          "invitedBy": null,
+          "invitees": [
+            {
+              "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+              "displayName": "Anna",
+              "createdAt": "2026-09-28T08:00:00.000Z"
+            },
+            {
+              "id": "05b903a4-81f0-517a-85ca-68f9ec892a38",
+              "displayName": "David",
+              "createdAt": "2026-09-28T08:30:00.000Z"
+            },
+            {
+              "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
+              "displayName": "Elena",
+              "createdAt": "2026-09-29T10:00:00.000Z"
+            },
+            {
+              "id": "488c3c8d-14fc-54f5-bd3f-50c0235ef61f",
+              "displayName": "Mikhail",
+              "createdAt": "2026-09-29T11:00:00.000Z"
+            },
+            {
+              "id": "f5d9e6e0-377a-5f05-a01e-fd6c674ee419",
+              "displayName": "Sarah",
+              "createdAt": "2026-09-29T12:00:00.000Z"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/users/nobody"
+      },
+      "response": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "User not found"
+          }
+        }
+      }
+    }
+  ]
+}

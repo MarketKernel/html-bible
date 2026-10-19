@@ -1,0 +1,79 @@
+{
+  "name": "auth-register",
+  "description": "A new account needs an invitation code. The login (lowercased) is unique, the first display name is the login as typed; the inviter is public. The token opens the API at once.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/invites",
+        "headers": {
+          "Authorization": "Bearer <token:anna>"
+        }
+      },
+      "save": {
+        "code": "code"
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "seq": 1,
+          "code": "2-1-PHFF6-7X471"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "login": "Maria_K",
+          "password": "correct horse",
+          "invite": "{code}"
+        }
+      },
+      "save": {
+        "maria": "token"
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "token": "<token>",
+          "user": {
+            "id": "<uuid>",
+            "number": 7,
+            "login": "maria_k",
+            "displayName": "Maria_K",
+            "createdAt": "<iso8601>",
+            "invitedBy": {
+              "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+              "displayName": "Anna"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/me",
+        "headers": {
+          "Authorization": "Bearer {maria}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "<uuid>",
+          "number": 7,
+          "login": "maria_k",
+          "displayName": "Maria_K",
+          "createdAt": "<iso8601>",
+          "invitedBy": {
+            "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+            "displayName": "Anna"
+          }
+        }
+      }
+    }
+  ]
+}

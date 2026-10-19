@@ -1,10 +1,5 @@
 {
   "dataUrl": "data/",
   "apiUrl": "https://api.bible.marketkernel.com/v1/",
-  "auth": {
-    "issuer": "https://auth.bible.marketkernel.com/",
-    "clientId": "html-bible",
-    "providers": ["google", "apple", "microsoft"],
-    "siteUrl": "https://bible.marketkernel.com/"
-  }
+  "siteUrl": "https://bible.marketkernel.com/"
 }

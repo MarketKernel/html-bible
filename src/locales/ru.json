@@ -7,13 +7,36 @@
     "Something went wrong ({status}).": "Что-то пошло не так ({status})."
   },
   "auth": {
-    "Signed in": "Вы вошли",
-    "Sign-in failed. Try again.": "Войти не удалось. Попробуйте ещё раз.",
     "Discussions are not available in this build.": "В этой сборке дискуссии недоступны.",
     "Sign in": "Вход",
     "Signing in is needed only to take part in discussions: to ask, argue and vote. Reading needs no account.": "Вход нужен только для участия в дискуссиях: задавать вопросы, приводить доводы и голосовать. Для чтения аккаунт не нужен.",
-    "This page is opened from a file. Signing in works on the site: it will open in a new tab.": "Страница открыта из файла. Войти можно на сайте — он откроется в новой вкладке.",
-    "Sign in with {provider}": "Войти через {provider}"
+    "Wrong login or password.": "Неверный логин или пароль.",
+    "This login is taken.": "Этот логин уже занят.",
+    "The current password is wrong.": "Текущий пароль неверен.",
+    "Too many attempts. Try again in {minutes} min.": "Слишком много попыток. Попробуйте через {minutes} мин.",
+    "This name was rejected.": "Это имя не прошло модерацию.",
+    "A login is 3–32 characters: letters a–z, digits, \".\", \"_\" or \"-\".": "Логин — от 3 до 32 символов: латинские буквы a–z, цифры, «.», «_» или «-».",
+    "A password is 8–128 characters and not the same as the login.": "Пароль — от 8 до 128 символов и не совпадает с логином.",
+    "You were signed out. Sign in again.": "Вы вышли из аккаунта. Войдите снова.",
+    "Your name in discussions": "Ваше имя в дискуссиях",
+    "Others will see it next to what you write.": "Его увидят рядом со всем, что вы напишете.",
+    "Current password": "Текущий пароль",
+    "New password": "Новый пароль",
+    "Other devices will be signed out.": "На других устройствах произойдёт выход из аккаунта.",
+    "The password is changed.": "Пароль изменён.",
+    "Change password": "Сменить пароль",
+    "Create an account": "Создать аккаунт",
+    "Login": "Логин",
+    "Password": "Пароль",
+    "Account for discussions": "Аккаунт для дискуссий",
+    "Signed in as {name}": "Вы вошли как {name}",
+    "This invitation code is not valid.": "Такого кода приглашения нет.",
+    "This invitation code has already been used.": "Этот код приглашения уже использован.",
+    "Enter the invitation code you were given, like 1-7-K3M9Q-T8ZR2.": "Введите код приглашения, который вам дали, например 1-7-K3M9Q-T8ZR2.",
+    "Invitation code": "Код приглашения",
+    "An account needs an invitation code from a member. A login of 3–32 characters (letters a–z, digits, \".\", \"_\", \"-\") and a password of at least 8. Others see your name, which starts as the login and can be changed.": "Аккаунт создаётся только по коду приглашения от участника. Логин — от 3 до 32 символов (латинские буквы a–z, цифры, «.», «_», «-»), пароль — не короче 8. Другие видят ваше имя: сначала это логин, потом его можно сменить.",
+    "{name} invites you.": "Вас приглашает {name}.",
+    "You are signed in already, as {name}.": "Вы уже вошли — как {name}."
   },
   "comments": {
     "My comments": "Мои комментарии",
@@ -72,8 +95,6 @@
     "No connection: the list may be out of date.": "Нет связи: список мог устареть.",
     "Use this verse in a discussion": "Привести этот стих в дискуссии",
     "Discussions · {verse}": "Дискуссии · {verse}",
-    "Your name in discussions": "Ваше имя в дискуссиях",
-    "Others will see it next to what you write.": "Его увидят рядом с тем, что вы напишете.",
     "AI is re-evaluating…": "AI пересчитывает…",
     "Discussions": "Дискуссии",
     "No connection to the server. Discussions need the internet.": "Нет связи с сервером. Для дискуссий нужен интернет.",
@@ -130,7 +151,6 @@
     "The AI’s result": "Итог по оценке AI",
     "What does this verse teach?": "Чему учит этот стих?",
     "The verse confirms:": "Стих подтверждает:",
-    "added by {name}": "добавил(а) {name}",
     "Remove the verse from the subtopic?": "Убрать стих из подтемы?",
     "Possible while no one else has voted for it and there are no interpretations.": "Можно, пока за него не голосовали другие и нет толкований.",
     "Remove": "Убрать",
@@ -143,6 +163,8 @@
     "What the verse means and why it supports this position.": "Что значит стих и почему он подтверждает эту позицию.",
     "Write the interpretation.": "Напишите толкование.",
     "Added. The AI is re-evaluating the verse.": "Добавлено. AI пересчитывает стих.",
+    "Checking the text…": "Идёт проверка текста…",
+    "Still checking: the text is moderated and translated. It can take up to a minute.": "Проверка ещё идёт: текст модерируется и переводится. Это может занять до минуты.",
     "Interpretation · {verse}": "Толкование · {verse}",
     "Column": "Колонка",
     "What this subtopic is about (optional)": "О чём эта подтема (необязательно)",
@@ -164,7 +186,10 @@
     "Disagree with the interpretation": "Не согласен с толкованием",
     "The verse text is not in the translation being read.": "Текста стиха нет в текущем переводе.",
     "Equal": "Поровну",
-    "No points yet": "Пока нет оценок"
+    "No points yet": "Пока нет оценок",
+    "Save as JSON": "Сохранить в JSON",
+    "The topic with its subtopics, verses, ratings and interpretations, in both languages": "Тема с подтемами, стихами, оценками и толкованиями, на обоих языках",
+    "added by": "добавил(а)"
   },
   "editor": {
     "Link": "Ссылка",
@@ -193,7 +218,8 @@
     "Open a file…": "Открыть файл…",
     "Settings": "Настройки",
     "Account": "Аккаунт",
-    "Menu": "Меню"
+    "Menu": "Меню",
+    "Profile": "Профиль"
   },
   "pack": {
     "The file is not valid JSON.": "Файл — не JSON или повреждён.",
@@ -362,10 +388,15 @@
     "Dark": "Тёмная",
     "Theme": "Тема",
     "Account for discussions": "Аккаунт для дискуссий",
-    "Signed in as {name}": "Вы вошли как {name}",
     "Sign out": "Выйти",
     "Needed only to take part in discussions.": "Нужен только для участия в дискуссиях.",
-    "Sign in": "Войти"
+    "Sign in": "Войти",
+    "Change name": "Сменить имя",
+    "Change password": "Сменить пароль",
+    "Sign out on all devices": "Выйти на всех устройствах",
+    "Create an account": "Создать аккаунт",
+    "Signed in as {name}": "Вы вошли как {name}",
+    "Profile": "Профиль"
   },
   "update": {
     "Update": "Обновить",
@@ -374,5 +405,35 @@
   "tabs": {
     "Bible": "Библия",
     "Discussions": "Дискуссии"
+  },
+  "time": {
+    "edited": "изменено"
+  },
+  "profile": {
+    "No such member.": "Такого участника нет.",
+    "Member No. {number}": "Участник № {number}",
+    "since": "с",
+    "Invited by": "Пригласил(а):",
+    "The first member: invited by no one.": "Первый участник: никем не приглашён.",
+    "Invited": "Пригласил(а)",
+    "No one yet.": "Пока никого.",
+    "Profiles are not available in this build.": "В этой сборке профилей нет.",
+    "A new code; its link is copied.": "Новый код готов, ссылка скопирована.",
+    "New codes from {time}.": "Новые коды — {time}.",
+    "Get a code": "Получить код",
+    "You can get {count} more codes now.": {
+      "one": "Сейчас можно получить ещё {count} код.",
+      "few": "Сейчас можно получить ещё {count} кода.",
+      "many": "Сейчас можно получить ещё {count} кодов.",
+      "other": "Сейчас можно получить ещё {count} кода."
+    },
+    "Invitations": "Приглашения",
+    "An account can be made only with a code from a member. Each code works once and does not expire. Up to 10 codes, then more from the next midnight (UTC).": "Аккаунт можно создать только по коду от участника. Каждый код срабатывает один раз и не устаревает. До 10 кодов подряд, потом новые — после ближайшей полуночи по UTC.",
+    "used by": "использовал(а)",
+    "The invitation link is copied.": "Ссылка-приглашение скопирована.",
+    "Copy the link": "Скопировать ссылку",
+    "Profile": "Профиль",
+    "Sign in to see your profile and invite others.": "Войдите, чтобы увидеть свой профиль и приглашать других.",
+    "Login: {login} (only you see it)": "Логин: {login} (его видите только вы)"
   }
 }

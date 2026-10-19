@@ -18,7 +18,7 @@ Where it runs:
 | --- | --- | --- | --- |
 | GitHub Pages — the demo | `config/build.demo.json` | opened from disk only | — |
 | `bible.marketkernel.com` on Cloudflare Pages | `config/build.json` | `data/` beside the page | AWS (`docs/deploy.md`) |
-| this computer | `config/build.dev.json` | `data/` from the local stub | the Python stub |
+| this computer | `config/build.dev.json` | `data/` from the local server | the local server (`server/`) |
 
 ## Features
 
@@ -36,39 +36,41 @@ Where it runs:
   straight to the verse.
 - **Comments**: commentary sets (JSON) and your own comments — offline only, exported to
   a JSON file anyone can open as a commentary.
-- **Discussions** (second tab, needs sign-in with Google, Apple or Microsoft): question →
+- **Discussions** (second tab, needs an account: a login and a password, made only with an
+  invitation code from a member; the first member is `root`): question →
   arguments → points for and against with verses. Two separate ratings: the AI's
   (re-evaluated automatically after every addition) and the users' votes. Everyone reads
-  and writes in their own language (ru/en); the server translates.
+  and writes in their own language (ru/en); the server translates. A topic can be saved as a JSON file
+  (`html-bible/discussion`: both languages, ratings, interpretations; nobody's own votes).
+- **Profiles**: who invited whom is public; one's own profile has the name, the password and
+  the invitation codes (10, then more from the next midnight UTC). Times are shown in the
+  reader's time zone.
 - Interface in English and Russian; light and dark themes; phone layout.
 
 ## Network: what and why
 
-Unlike a fully offline single-file app, this page talks to three places, all set at
+Unlike a fully offline single-file app, this page talks to two places, both set at
 build time and written into the Content-Security-Policy (`connect-src`):
 
 | Address | Why |
 | --- | --- |
-| `dataUrl` | `catalog.json` (the index), translations, commentaries. Relative (`data/`): beside the page, and from disk beside `auth.siteUrl`; empty: nothing is downloaded |
-| `apiUrl` | the discussions API (AWS Lambda later; a Python stub now) |
-| `auth.issuer` | sign-in (Amazon Cognito hosted endpoints; the stub now) |
+| `dataUrl` | `catalog.json` (the index), translations, commentaries. Relative (`data/`): beside the page, and from disk beside `siteUrl`; empty: nothing is downloaded |
+| `apiUrl` | the discussions API with its sign-in (`server/`: AWS Lambda in production, the same code locally) |
 
 Images in comments and discussion points are whatever their authors link to
 (`img-src https:`), loaded with `no-referrer`. Nothing else is fetched; the one inline
 script is pinned by its hash.
 
 A page opened from `file://` downloads translations from the site (the data host must
-send CORS headers — `config/cloudflare/_headers`) but cannot sign in: "Sign in" opens
-the site instead.
+send CORS headers — `config/cloudflare/_headers`) and signs in like the site does.
 
 ## Your own domain
 
 Addresses live in `config/build.json` and are overridden without touching code:
 
 ```sh
-node build.mjs --data-url data/ --api-url https://api.example.org/v1/ \
-  --auth-issuer https://auth.example.org/ --site-url https://example.org/
-# or BIBLE_DATA_URL, BIBLE_API_URL, BIBLE_AUTH_ISSUER, BIBLE_AUTH_CLIENT_ID, BIBLE_SITE_URL
+node build.mjs --data-url data/ --api-url https://api.example.org/v1/ --site-url https://example.org/
+# or BIBLE_DATA_URL, BIBLE_API_URL, BIBLE_SITE_URL
 # or --config config/build.staging.json
 ```
 
@@ -80,12 +82,12 @@ redirect on the old domain that keeps the `#…` part.
 ```sh
 npm install
 npm run build          # build/html-bible.html and build/pages/ (production addresses)
-npm run build:dev      # the same against the local stub (http://localhost:8787)
+npm run build:dev      # the same against the local server (http://localhost:8787)
 node build.mjs --config config/build.demo.json   # the demo: no data, no server
-npm run server         # the Python stub: API, sign-in, data/ — Python 3.9+, no packages
+npm run server         # the local server (server/, Rust): API, sign-in, data/
 npm test               # unit tests (Node, no framework)
-npm run test:server    # the stub's tests
-npm run test:browser   # headless Chrome: the built page end to end (starts the stub itself)
+npm run test:server    # the server's tests, with the contract fixtures (cargo test)
+npm run test:browser   # headless Chrome: the built page end to end (starts the server itself)
 npm run check          # all of the above; "done" means this is green
 npm run i18n           # strings missing from or unused in src/locales/ru.json
 ```
@@ -93,13 +95,15 @@ npm run i18n           # strings missing from or unused in src/locales/ru.json
 To try it on your computer:
 
 ```sh
-build_scripts/start.sh            # build against the local stub, start it, open http://localhost:8787/
+build_scripts/start.sh            # build against the local server, start it, open http://localhost:8787/
 build_scripts/start.sh --reset    # the same, discussions reset to the demo question
-build_scripts/build.sh            # only build (local stub addresses); --prod for config/build.json
+build_scripts/start.sh --aws      # the same page, but discussions and sign-in from the API in AWS
+build_scripts/build.sh            # only build (local server addresses); --prod for config/build.json
 PORT=9000 build_scripts/start.sh  # another port
 ```
 
-Demo users on the stub's sign-in page: Anna (Google), David (Microsoft), Elena (Apple).
+Demo users of the local server: `anna`, `david`, `elena`, `mikhail`, `sarah`; the password is
+`<login>-demo`. Node.js 22+ and Rust (rustup) are needed.
 While developing, `npm run watch` rebuilds on every change.
 
 Publishing:
@@ -107,6 +111,7 @@ Publishing:
 ```sh
 build_scripts/cloudflare.sh            # build/cloudflare/: the PWA, html-bible.html, data/, _headers
 build_scripts/cloudflare.sh --deploy   # … and upload it to Cloudflare Pages (wrangler)
+build_scripts/aws.sh                   # the API: Lambda, DynamoDB, api.bible.marketkernel.com
 ```
 
 The demo goes to GitHub Pages from CI (`.github/workflows/test.yml`, job `demo`) after
@@ -117,9 +122,14 @@ every green push to `main`.
 The texts are built locally and published with the site; git keeps only
 `data/meta/` (KJV verse counts the server needs).
 
-- `data/translations/` — KJV (eBible.org USFM) and the Synodal (CrossWire RusSynodal,
-  77 books), converted by `tools/translations/build.mjs` from `private/sources/`;
-  format in `Task.md` §5.1.
+- `data/translations/` — converted by `tools/translations/build.mjs` from
+  `private/sources/` (each converter's header says where to download its source);
+  format in `Task.md` §5.1:
+  - English: KJV, ASV, BSB, Darby, WEB, YLT (eBible.org USFM);
+  - Russian: the Synodal (CrossWire RusSynodal, 77 books);
+  - Ukrainian: Ohienko (bolls.life; CrossWire's copy merges verses).
+  All but the Synodal are in KJV numbering: where an edition numbers otherwise
+  (WEB's Romans doxology, Ohienko's Psalm titles), the converter folds it in.
 - `data/commentaries/` — commentary sets split per book (Lopukhin,
   `tools/commentaries/lopukhin.py`).
 - `data/catalog.json` — generated (`tools/translations/build-catalog.mjs`), with sizes
@@ -130,16 +140,17 @@ Without `data/` (a fresh clone, CI) the tests of the texts are skipped
 test runs on `tests/fixtures/data/`: every book, chapter and verse of both
 translations, with text only in the chapters it reads (`node tools/test-data.mjs`).
 
-Both translations are in the public domain (the KJV is under Crown patent in the UK).
+All translations are in the public domain (the KJV is under Crown patent in the UK;
+Ohienko as CrossWire distributes it — he died in 1972).
 
 ## Layout
 
 | Path | What |
 | --- | --- |
-| `src/core/` | logic without DOM: books, references, versification, search, Markdown subset, packages, routes, PKCE, i18n |
+| `src/core/` | logic without DOM: books, references, versification, search, Markdown subset, packages, routes, i18n |
 | `src/app/` | the page: reader, comments, compare, search, discussions, settings, packs, sign-in |
 | `src/pwa/sw.js` | the PWA's service worker |
-| `server/` | Python stubs shaped as AWS Lambda handlers; `docs/api.md` is the contract |
+| `server/` | the discussions API in Rust: one AWS Lambda, or the local server (`src/bin/local.rs`); `docs/api.md` is the contract |
 | `tools/` | test loader, Chrome driver, i18n, data converters |
 | `tests/` | unit tests and the browser test |
 | `Task.md` | the specification |

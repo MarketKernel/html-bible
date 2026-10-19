@@ -2,11 +2,11 @@
   "comment": "Demo topic (Task.md §4). Verses are shared by both sides; each side explains them in its column. Both languages are written out. Written to present both readings fairly.",
   "evaluatedAt": "2026-10-01T09:00:00.000Z",
   "users": [
-    { "key": "anna", "provider": "google", "displayName": "Anna", "createdAt": "2026-09-28T08:00:00.000Z" },
-    { "key": "david", "provider": "microsoft", "displayName": "David", "createdAt": "2026-09-28T08:30:00.000Z" },
-    { "key": "elena", "provider": "apple", "displayName": "Elena", "createdAt": "2026-09-29T10:00:00.000Z" },
-    { "key": "mikhail", "provider": "google", "displayName": "Mikhail", "createdAt": "2026-09-29T11:00:00.000Z" },
-    { "key": "sarah", "provider": "apple", "displayName": "Sarah", "createdAt": "2026-09-29T12:00:00.000Z" }
+    { "key": "anna", "id": "2764d8bf-5142-5be3-b585-4991ff43a045", "login": "anna", "displayName": "Anna", "createdAt": "2026-09-28T08:00:00.000Z" },
+    { "key": "david", "id": "05b903a4-81f0-517a-85ca-68f9ec892a38", "login": "david", "displayName": "David", "createdAt": "2026-09-28T08:30:00.000Z" },
+    { "key": "elena", "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace", "login": "elena", "displayName": "Elena", "createdAt": "2026-09-29T10:00:00.000Z" },
+    { "key": "mikhail", "id": "488c3c8d-14fc-54f5-bd3f-50c0235ef61f", "login": "mikhail", "displayName": "Mikhail", "createdAt": "2026-09-29T11:00:00.000Z" },
+    { "key": "sarah", "id": "f5d9e6e0-377a-5f05-a01e-fd6c674ee419", "login": "sarah", "displayName": "Sarah", "createdAt": "2026-09-29T12:00:00.000Z" }
   ],
   "questions": [
     {

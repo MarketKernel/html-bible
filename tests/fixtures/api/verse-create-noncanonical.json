@@ -7,7 +7,7 @@
         "method": "POST",
         "path": "/v1/arguments/01JAS000000000000000000A02/verses",
         "headers": {
-          "Authorization": "Bearer <jwt:elena>"
+          "Authorization": "Bearer <token:elena>"
         },
         "body": {
           "ref": {

@@ -8,9 +8,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - uses: actions/setup-python@v5
+      # The server (server/, Rust): the runner has rustup; the build is cached.
+      - uses: Swatinem/rust-cache@v2
         with:
-          python-version: '3.11'
+          workspaces: server
       - run: npm ci
       - run: npm run check
       - name: No external references in the page

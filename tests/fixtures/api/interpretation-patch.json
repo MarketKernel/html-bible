@@ -7,7 +7,7 @@
         "method": "PATCH",
         "path": "/v1/interpretations/01JAS000000000000000000T01",
         "headers": {
-          "Authorization": "Bearer <jwt:anna>"
+          "Authorization": "Bearer <token:anna>"
         },
         "body": {
           "lang": "en",

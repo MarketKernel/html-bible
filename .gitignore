@@ -8,6 +8,8 @@ data/*
 !data/meta/
 shots/
 server/.data/
+server/target/
+.wrangler/
 *.tsbuildinfo
 coverage/
 
@@ -28,7 +30,7 @@ private/
 npm-debug.log*
 
 # Spec and assistant files
-Task.md
+Task*.md
 CLAUDE.md
 .claude/
 

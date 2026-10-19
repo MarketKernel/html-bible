@@ -1,0 +1,46 @@
+{
+  "name": "auth-register-taken",
+  "description": "A login is unique regardless of case: 409 login_taken.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/invites",
+        "headers": {
+          "Authorization": "Bearer <token:anna>"
+        }
+      },
+      "save": {
+        "code": "code"
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "seq": 1,
+          "code": "2-1-PHFF6-7X471"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "login": "ANNA",
+          "password": "another password",
+          "invite": "{code}"
+        }
+      },
+      "response": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "login_taken",
+            "message": "This login is taken",
+            "field": "login"
+          }
+        }
+      }
+    }
+  ]
+}

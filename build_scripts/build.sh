@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Builds the page for trying it on this computer.
 #
-#   build_scripts/build.sh           against the local stub (http://localhost:8787):
+#   build_scripts/build.sh           against the local server (http://localhost:8787):
 #                                    data, discussions and sign-in all from start.sh
 #   build_scripts/build.sh --prod    with the production addresses of config/build.json
-#   PORT=9000 build_scripts/build.sh the local stub on another port
+#   build_scripts/build.sh --aws     data from the local server, but the API (discussions,
+#                                    sign-in) of config/build.json: the one in AWS
+#   PORT=9000 build_scripts/build.sh the local server on another port
 #
 # Result: build/html-bible.html (the single file) and build/pages/ (the PWA).
 set -euo pipefail
@@ -25,11 +27,14 @@ if [ ! -d node_modules ] || [ package.json -nt node_modules ]; then
   touch node_modules
 fi
 
-if [ "${1:-}" = "--prod" ]; then
-  node build.mjs
-else
-  PORT="${PORT:-8787}"
-  BASE="http://localhost:${PORT}/"
-  node build.mjs --config config/build.dev.json \
-    --data-url "${BASE}data/" --api-url "${BASE}v1/" --auth-issuer "${BASE}" --site-url "${BASE}"
-fi
+PORT="${PORT:-8787}"
+BASE="http://localhost:${PORT}/"
+case "${1:-}" in
+  --prod) node build.mjs ;;
+  --aws)
+    API="$(node -p 'require("./config/build.json").apiUrl')"
+    node build.mjs --config config/build.dev.json --data-url "${BASE}data/" --api-url "$API" --site-url "${BASE}" ;;
+  "")
+    node build.mjs --config config/build.dev.json --data-url "${BASE}data/" --api-url "${BASE}v1/" --site-url "${BASE}" ;;
+  *) echo "Unknown option: $1" >&2; exit 1 ;;
+esac

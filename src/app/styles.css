@@ -290,6 +290,12 @@ button { cursor: pointer; }
 .pack .meta { font-size: 12.5px; color: var(--text-faint); }
 .progress { height: 6px; border-radius: 3px; background: var(--bg-sunken); overflow: hidden; }
 .progress > div { height: 100%; background: var(--accent); width: 0; transition: width 0.15s; }
+/* No percentage to show while the server checks a text: a stripe runs across instead. */
+.progress.running > div { width: 35%; transition: none; animation: running 1.2s ease-in-out infinite; }
+@keyframes running { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+.sending { display: grid; gap: 8px; margin-top: 12px; }
+.sending[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .progress.running > div { animation: none; width: 100%; opacity: 0.5; } }
 .drop-hint { border: 2px dashed var(--line-strong); border-radius: var(--radius); padding: 18px; text-align: center; color: var(--text-soft); }
 .app.dragging::after { content: ''; position: fixed; inset: 8px; border: 3px dashed var(--accent); border-radius: 16px; z-index: 60; pointer-events: none; }
 
@@ -343,6 +349,19 @@ button { cursor: pointer; }
 .mini-scale .dot { position: absolute; top: -3px; width: 12px; height: 12px; margin-inline-start: -6px; border-radius: 50%; background: var(--text); border: 2px solid var(--bg-raised); }
 
 .scales { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 8px 0 18px; }
+.topic-bar { margin: 0 0 8px; }
+.byline { color: var(--text-faint); font-size: 13px; }
+.byline .person { color: inherit; }
+.meta.byline { margin: 4px 0 10px; }
+time { white-space: nowrap; }
+.profile > .row { margin-bottom: 16px; }
+.profile .people { list-style: none; padding: 0; margin: 0; }
+.profile .people li { padding: 4px 0; }
+.codes { list-style: none; padding: 0; margin: 12px 0 0; }
+.code-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 6px 0; border-top: 1px solid var(--line); }
+.code-row code { font-size: 14px; letter-spacing: 0.04em; }
+.code-row.used code { color: var(--text-faint); text-decoration: line-through; }
+.invited-by { margin: -6px 0 10px; }
 .scale-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-raised); padding: 12px; text-align: center; }
 .scale-card h3 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); }
 .scale-card svg { width: 100%; max-width: 260px; height: auto; display: block; margin: 4px auto; }
@@ -469,21 +488,9 @@ button { cursor: pointer; }
 .version { color: var(--text-faint); font-size: 12px; text-align: center; margin-top: 24px; }
 
 /* ---------- sign-in ---------- */
-.sign-in { text-align: center; }
-.providers { display: flex; justify-content: center; gap: 16px; margin: 8px 0 18px; }
-.provider-button {
-  width: 92px; height: 92px; border-radius: 22px; display: inline-flex; align-items: center; justify-content: center;
-  border: 1px solid var(--line-strong); background: #fff; color: #000; box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
-  transition: transform 0.12s, box-shadow 0.12s;
-}
-.provider-button:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-.provider-button:active { transform: translateY(0); }
-.provider-button .provider-logo { width: 42px; height: 42px; }
-/* Apple's own button is black with a white apple (white on a dark page). */
-.provider-button.apple { background: #000; border-color: #000; color: #fff; }
-.provider-button.apple .provider-logo { width: 40px; height: 40px; margin-top: -3px; }
-:root[data-theme='dark'] .provider-button.apple { background: #fff; border-color: #fff; color: #000; }
-:root[data-theme='dark'] .provider-button:not(.apple) { border-color: transparent; }
+.sign-in .tabs { align-self: flex-start; margin: 0 0 14px; width: fit-content; }
+.sign-in .input { width: 100%; }
+.form-error { color: var(--danger); margin: 0 0 10px; }
 
 /* ---------- menu ---------- */
 .menu { position: fixed; z-index: 45; min-width: 230px; background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 6px; }

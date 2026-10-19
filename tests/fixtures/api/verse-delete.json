@@ -7,7 +7,7 @@
         "method": "POST",
         "path": "/v1/arguments/01JAS000000000000000000A01/verses",
         "headers": {
-          "Authorization": "Bearer <jwt:elena>"
+          "Authorization": "Bearer <token:elena>"
         },
         "body": {
           "ref": {
@@ -83,7 +83,7 @@
         "method": "PUT",
         "path": "/v1/votes/verse/{newVerse}",
         "headers": {
-          "Authorization": "Bearer <jwt:elena>"
+          "Authorization": "Bearer <token:elena>"
         },
         "body": {
           "value": 1
@@ -145,7 +145,7 @@
         "method": "DELETE",
         "path": "/v1/verses/{newVerse}",
         "headers": {
-          "Authorization": "Bearer <jwt:elena>"
+          "Authorization": "Bearer <token:elena>"
         }
       },
       "response": {

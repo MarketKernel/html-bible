@@ -1,10 +1,5 @@
 {
   "dataUrl": "",
   "apiUrl": "",
-  "auth": {
-    "issuer": "",
-    "clientId": "",
-    "providers": ["google", "apple", "microsoft"],
-    "siteUrl": ""
-  }
+  "siteUrl": ""
 }

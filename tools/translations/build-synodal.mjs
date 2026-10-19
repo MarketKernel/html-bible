@@ -28,7 +28,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { load } from '../load.mjs';
 import { bookMeta, books, clip, counts, dataDir, sourcesDir, writeTranslation } from './common.mjs';
-import { flattenBrackets, normalizeSpace } from './usfm.mjs';
+import { balanceChapter, flattenBrackets, normalizeSpace } from './usfm.mjs';
 import { parseCanonHeader, readZText } from './sword.mjs';
 import { validateTranslation } from './validate.mjs';
 
@@ -176,32 +176,10 @@ for (const [id, ranges] of Object.entries(SYNODAL_NONCANONICAL)) {
 
 for (const [id, chapters] of raw) {
   chapters.forEach((verses, c) => {
-    // Where does each verse leave the bracket depth?
-    let carry = false;
-    for (let v = 0; v < verses.length; v += 1) {
-      let text = carry ? `[${verses[v]}` : verses[v];
-      let depth = 0;
-      for (const ch of text) depth += ch === '[' ? 1 : ch === ']' ? -1 : 0;
-      if (depth > 0) {
-        // Closed later in the chapter? Then close here and reopen next verse.
-        const rest = verses.slice(v + 1).join(' ');
-        if (rest.indexOf(']') >= 0 && (rest.indexOf('[') < 0 || rest.indexOf(']') < rest.indexOf('['))) {
-          report.spanning.push(`${id} ${c + 1}:${v + 1}`);
-          text = `${text}]`;
-          carry = true;
-        } else {
-          // Never closed: a stray bracket in the source.
-          const at = text.lastIndexOf('[');
-          text = text.slice(0, at) + text.slice(at + 1);
-          report.stray.push(`${id} ${c + 1}:${v + 1}`);
-          carry = false;
-        }
-      } else {
-        carry = false;
-        if (depth < 0) throw new Error(`${id} ${c + 1}:${v + 1}: closing bracket without an opening one`);
-      }
-      verses[v] = normalizeSpace(text.replace(/\[\]/g, ''));
-    }
+    const { spanning, stray, unopened } = balanceChapter(verses);
+    if (unopened.length) throw new Error(`${id} ${c + 1}:${unopened[0]}: closing bracket without an opening one`);
+    report.spanning.push(...spanning.map((v) => `${id} ${c + 1}:${v}`));
+    report.stray.push(...stray.map((v) => `${id} ${c + 1}:${v}`));
   });
 }
 

@@ -11,26 +11,17 @@ export interface AppConfig {
    * Empty — nothing to download: the user opens files.
    */
   dataUrl: string;
-  /** The discussions API, "…/v1/". Empty — no server. */
+  /** The discussions API with its sign-in, "…/v1/". Empty — no server. */
   apiUrl: string;
-  auth: {
-    /** Cognito domain (or the local stub): /oauth2/authorize, /oauth2/token, /logout. */
-    issuer: string;
-    clientId: string;
-    providers: ('google' | 'apple' | 'microsoft')[];
-    /**
-     * The site. A page opened from file:// sends the user here to sign in,
-     * and reads a relative dataUrl from here.
-     */
-    siteUrl: string;
-  };
+  /** The site: a page opened from file:// reads a relative dataUrl from here. */
+  siteUrl: string;
 }
 
 declare const __CONFIG__: AppConfig;
 
 export const CONFIG: AppConfig =
   typeof __CONFIG__ === 'undefined'
-    ? { dataUrl: '', apiUrl: '', auth: { issuer: '', clientId: '', providers: ['google', 'apple', 'microsoft'], siteUrl: '' } }
+    ? { dataUrl: '', apiUrl: '', siteUrl: '' }
     : __CONFIG__;
 
 /**
@@ -42,6 +33,6 @@ export const CONFIG: AppConfig =
 export function dataBase(config: AppConfig, page: string): string {
   if (!config.dataUrl) return '';
   if (/^[a-z][a-z0-9+.-]*:/i.test(config.dataUrl)) return config.dataUrl;
-  const base = page.startsWith('file:') ? config.auth.siteUrl : page;
+  const base = page.startsWith('file:') ? config.siteUrl : page;
   return base ? new URL(config.dataUrl, base).href : '';
 }

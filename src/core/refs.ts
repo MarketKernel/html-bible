@@ -164,10 +164,13 @@ export function formatLink(ref: ParsedRef): string {
   return `${prefix}${book}${first.chapter}-${verses}`;
 }
 
-/** «Мф 3:3», "Matt 3:16-18" — for people. */
-export function formatHuman(ref: Pick<ParsedRef, 'book' | 'parts'>, lang: Lang, form: 'short' | 'name' = 'short'): string {
+/**
+ * «Мф 3:3», "Matt 3:16-18" — for people. `bookName` overrides the book's
+ * name, for a translation in a language books.ts has no names in.
+ */
+export function formatHuman(ref: Pick<ParsedRef, 'book' | 'parts'>, lang: Lang, form: 'short' | 'name' = 'short', bookName?: string): string {
   const info = bookInfo(ref.book);
-  const name = info ? info[lang][form] : ref.book;
+  const name = bookName ?? (info ? info[lang][form] : ref.book);
   return `${name} ${partsText(ref.parts, ':', '–')}`;
 }
 

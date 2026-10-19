@@ -1,0 +1,59 @@
+{
+  "name": "auth-login",
+  "description": "Sign in with a login (any case) and password; each sign-in is a new session (device).",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/login",
+        "body": {
+          "login": "Anna",
+          "password": "anna-demo"
+        }
+      },
+      "save": {
+        "anna": "token"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "token": "<token>",
+          "user": {
+            "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+            "number": 2,
+            "login": "anna",
+            "displayName": "Anna",
+            "createdAt": "2026-09-28T08:00:00.000Z",
+            "invitedBy": {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "displayName": "root"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/me",
+        "headers": {
+          "Authorization": "Bearer {anna}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+          "number": 2,
+          "login": "anna",
+          "displayName": "Anna",
+          "createdAt": "2026-09-28T08:00:00.000Z",
+          "invitedBy": {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "displayName": "root"
+          }
+        }
+      }
+    }
+  ]
+}

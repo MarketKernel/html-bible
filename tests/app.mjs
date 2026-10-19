@@ -1,8 +1,8 @@
 /**
  * The built page in headless Chrome: the first run, readable and free-form
  * links, renumbering between translations, selection, copying, the user's own
- * comments, comparison, noncanonical verses, search — and, when the Python
- * stub can be started, sign-in and a discussion.
+ * comments, comparison, noncanonical verses, search — and, when the server
+ * (server/, Rust) can be built, sign-in and a discussion.
  *
  * Builds its own copy (dev profile) into a temporary folder with this test's
  * addresses, serves it with tests/fixtures/data/ (cut from the real texts by
@@ -29,7 +29,7 @@ const SHOTS = shotsAt > 0 ? process.argv[shotsAt + 1] : null;
 if (SHOTS) await mkdir(SHOTS, { recursive: true });
 const { check, done } = checker();
 
-/* ---------------- the Python stub (discussions), if Python is here ---------------- */
+/* ---------------- the server (discussions), if Rust is here ---------------- */
 
 const free = () =>
   new Promise((resolve) => {
@@ -43,16 +43,23 @@ const free = () =>
 const PAGE_PORT = await free();
 const API_PORT = await free();
 let api = null;
-const python = existsSync(join(root, 'server', 'local_server.py'));
-if (python) {
-  api = spawn('python3', [join(root, 'server', 'local_server.py'), '--port', String(API_PORT), '--reset'], { cwd: root, stdio: ['ignore', 'ignore', 'pipe'] });
+// Its own store in a temporary folder: the developer's server/.data/ stays as it is.
+const store = await mkdtemp(join(tmpdir(), 'bible-store-'));
+let binary = join(root, 'server', 'target', 'debug', 'local');
+try {
+  execFileSync('cargo', ['build', '--quiet', '--bin', 'local'], { cwd: join(root, 'server'), stdio: ['ignore', 'ignore', 'inherit'] });
+} catch {
+  binary = existsSync(binary) ? binary : null;
+}
+if (binary) {
+  api = spawn(binary, ['--port', String(API_PORT), '--reset', '--data-dir', store, '--quiet'], { cwd: root, stdio: ['ignore', 'ignore', 'pipe'] });
   let up = false;
   for (let i = 0; i < 50 && !up; i += 1) {
     await sleep(100);
     up = await fetch(`http://127.0.0.1:${API_PORT}/v1/health`).then((r) => r.ok).catch(() => false);
   }
   if (!up) {
-    console.log('  the Python stub did not start: discussions are skipped');
+    console.log('  the server did not start: discussions are skipped');
     api.kill();
     api = null;
   }
@@ -64,7 +71,7 @@ const out = await mkdtemp(join(tmpdir(), 'bible-app-'));
 const apiBase = api ? `http://127.0.0.1:${API_PORT}/` : '';
 execFileSync(
   process.execPath,
-  ['build.mjs', '--config', 'config/build.dev.json', '--out', out, '--data-url', 'data/', '--api-url', api ? `${apiBase}v1/` : '', '--auth-issuer', apiBase, '--site-url', `http://127.0.0.1:${PAGE_PORT}/`],
+  ['build.mjs', '--config', 'config/build.dev.json', '--out', out, '--data-url', 'data/', '--api-url', api ? `${apiBase}v1/` : '', '--site-url', `http://127.0.0.1:${PAGE_PORT}/`],
   { cwd: root, stdio: ['ignore', 'ignore', 'inherit'] },
 );
 const TYPES = { '.html': 'text/html; charset=utf-8', '.json': 'application/json', '.gz': 'application/gzip', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
@@ -239,6 +246,8 @@ try {
     await evaluate(`document.querySelector('.q-card').click()`);
     await until(`!!document.querySelector('.argument')`);
     check('topic: two scales', await evaluate(`document.querySelectorAll('.scale-card').length`), 2);
+    check('topic: can be saved as JSON', await evaluate(`[...document.querySelectorAll('.topic-bar .button')].map((b) => b.textContent)`), ['Save as JSON']);
+    await evaluate(`document.querySelector('.topic-bar .button').click()`);
     check('a verdict word under each scale', await evaluate(`[...document.querySelectorAll('.scale-card .verdict-word')].map((v) => v.textContent.length > 0 && /pro|con|even|none/.test(v.className))`), [true, true]);
     // Opened straight from a link, before any chapter was read: the verses still have their text.
     await send('Page.reload');
@@ -254,6 +263,8 @@ try {
     };
     check('stones in Bible order', orders.every((list) => list.map(position).every((p, i, all) => p >= 0 && (i === 0 || all[i - 1] <= p))), true);
     check('each stone has three vote buttons and two columns', await evaluate(`[...document.querySelectorAll('.stone')].every((s) => s.querySelectorAll('.vote-button').length === 3 && s.querySelectorAll('.side-col').length === 2)`), true);
+    // Topics, subtopics, verses and interpretations show who and when.
+    check('authors link to profiles, with times', await evaluate(`{ const b = [...document.querySelectorAll('.point .byline, .stone .byline, .argument .byline')]; b.length > 10 && b.every((x) => !!x.querySelector('a.person[href^="#/users/"]') && !!x.querySelector('time[datetime]')) }`), true);
     await shot('discussion');
 
     // A verse in a discussion shows ⚖ in the reader, and its panel leads back.
@@ -264,19 +275,43 @@ try {
     await until(`!!document.querySelector('.side-panel .tag-item')`);
     check('verse panel: the topic and the results', await evaluate(`!!document.querySelector('.side-panel .tag-item .outcomes .outcome')`), true);
 
-    // Sign in with the stub (Google).
+    // Sign in: a wrong password first, then anna; she takes an invitation code.
+    const fill = (login, password) => evaluate(`{ const f = document.querySelector('.dialog form.sign-in'); f.querySelector('input[name="login"]').value = ${JSON.stringify(login)}; f.querySelector('input[type="password"]').value = ${JSON.stringify(password)}; f.requestSubmit() }`);
     await evaluate(`document.getElementById('account-button').click()`);
-    await until(`document.querySelectorAll('.dialog .provider-button').length === 3`);
-    check('three square sign-in buttons with logos', await evaluate(`[...document.querySelectorAll('.dialog .provider-button')].map((b) => [b.className.split(' ')[1], !!b.querySelector('svg.provider-logo'), b.textContent.trim()])`), [['apple', true, ''], ['google', true, ''], ['microsoft', true, '']]);
+    await until(`!!document.querySelector('.dialog form.sign-in input[name="login"]')`);
+    check('sign-in and new account tabs', await texts('.dialog .tabs .tab'), ['Sign in', 'Create an account']);
+    check('signing in takes a password of any length', await evaluate(`document.querySelector('.dialog input[type="password"]').hasAttribute('minlength')`), false);
     await shot('sign-in');
-    await evaluate(`document.querySelector('.dialog .provider-button.google').click()`);
-    await until(`location.port === '${API_PORT}'`, 10000);
-    await until(`!!document.querySelector('form')`);
-    await evaluate(`{ const n = document.querySelector('input[name="name"]'); if (n) n.value = 'Тест'; document.querySelector('button[value="allow"]').click() }`);
-    await until(`location.port === '${PAGE_PORT}' && !!document.querySelector('#account-button .avatar')`, 15000);
-    check('signed in', await text('#account-button .avatar'), 'Т');
-    await until(`!!document.querySelector('.dialog input')`, 5000).catch(() => undefined);
-    await evaluate(`document.querySelector('.dialog .dialog-actions .primary')?.click()`);
+    await fill('anna', 'not-her-password');
+    await until(`!document.querySelector('.dialog .form-error').hidden`, 10000);
+    check('wrong password told', await text('.dialog .form-error'), 'Wrong login or password.');
+    await fill('anna', 'anna-demo');
+    await until(`!document.querySelector('form.sign-in') && !!document.querySelector('#account-button .avatar')`, 10000);
+    await go('#/profile');
+    await until(`!!document.querySelector('.invitations .button.primary')`, 10000);
+    check('profile: member number and inviter', await evaluate(`[document.querySelector('.profile .meta')?.textContent.includes('Member No. 2'), !!document.querySelector('.profile a.person[href^="#/users/"]')]`), [true, true]);
+    await evaluate(`document.querySelector('.invitations .button.primary').click()`);
+    await until(`!!document.querySelector('.codes .code-row.free code')`, 10000);
+    const invitation = await text('.codes .code-row.free code');
+    check('a code for an invitation', /^2-1-[0-9A-Z]{5}-[0-9A-Z]{5}$/.test(invitation), true);
+    await shot('profile');
+    await evaluate(`[...document.querySelectorAll('.profile .button')].find((b) => b.textContent === 'Sign out').click()`);
+    await until(`!document.querySelector('#account-button .avatar')`, 10000);
+
+    // The invitation link: the new-account form with the code and who invites.
+    await go(`#/join/${invitation}`);
+    await until(`document.querySelector('.dialog input[name="invite"]')?.value === ${JSON.stringify(invitation)}`, 10000);
+    await until(`document.querySelector('.dialog .invited-by')?.textContent === 'Anna invites you.'`, 10000);
+    check('invitation link: who invites', true, true);
+    await fill('Tester', 'tester-password');
+    await until(`!document.querySelector('form.sign-in') && document.querySelector('.dialog .input')?.value === 'Tester'`, 10000);
+    check('new account: the name starts as the login', true, true);
+    await evaluate(`{ document.querySelector('.dialog .input').value = 'Тест'; document.querySelector('.dialog .dialog-actions .primary').click() }`);
+    await until(`document.querySelector('#account-button .avatar')?.textContent === 'Т'`, 10000);
+    check('signed in under the chosen name', await text('#account-button .avatar'), 'Т');
+    await go('#/profile');
+    await until(`!!document.querySelector('.profile .meta')`, 10000);
+    check('the new member was invited by anna', await evaluate(`[...document.querySelectorAll('.profile a.person')].some((a) => a.textContent === 'Anna')`), true);
 
     // Vote on a stone.
     await go('#/discussions');
@@ -357,5 +392,6 @@ try {
   server.close();
   api?.kill();
   await rm(out, { recursive: true, force: true });
+  await rm(store, { recursive: true, force: true });
 }
 done('app');

@@ -12,11 +12,43 @@ export interface LocalizedText {
   en?: string;
 }
 
+export interface Person {
+  id: string;
+  displayName: string;
+}
+
+/** The signed-in user as they see themselves (the login is theirs alone). */
 export interface User {
   id: string;
-  provider: 'google' | 'apple' | 'microsoft';
+  /** Member number: root is 1, then in the order of registration. */
+  number: number;
+  /** Lowercase, unique, never changes. */
+  login: string;
   displayName: string;
   createdAt: string;
+  /** Who invited them; none for root. */
+  invitedBy?: Person;
+}
+
+/** What anyone may see of a member: never the login or the codes. */
+export interface PublicProfile {
+  id: string;
+  number: number;
+  displayName: string;
+  createdAt: string;
+  invitedBy: Person | null;
+  invitees: (Person & { createdAt: string })[];
+}
+
+/** The user's invitation codes: the limit, and each code with who used it. */
+export interface InviteState {
+  issued: number;
+  limit: number;
+  /** "YYYY-MM-DD": from 00:00 UTC of this day more codes can be taken. */
+  resetOn: string | null;
+  /** Codes that can be taken right now. */
+  available: number;
+  codes: { seq: number; code: string; usedBy?: Person & { at: string } }[];
 }
 
 export interface Author {

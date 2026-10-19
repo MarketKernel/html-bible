@@ -14,9 +14,9 @@
     "watch": "node build.mjs --config config/build.dev.json --watch",
     "typecheck": "tsc --noEmit",
     "test": "node tools/run-tests.mjs",
-    "test:server": "python3 -m unittest discover -s server/tests -t .",
+    "test:server": "cargo test --quiet --all-features --manifest-path server/Cargo.toml",
     "test:browser": "node tests/app.mjs",
-    "server": "python3 server/local_server.py --port 8787",
+    "server": "cargo run --quiet --manifest-path server/Cargo.toml --bin local -- --port 8787",
     "i18n": "node tools/i18n.mjs",
     "shots": "node tools/shots.mjs",
     "check": "npm run typecheck && npm test && npm run test:server && npm run build && npm run test:browser"

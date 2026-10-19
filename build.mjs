@@ -4,20 +4,19 @@
  *
  * Styles, the icon and the compiled TypeScript are inlined; translations are
  * not — the page downloads them (or opens a file) into IndexedDB. So unlike a
- * fully offline single-file app, this one talks to three places, all set at
+ * fully offline single-file app, this one talks to two places, both set at
  * build time and written into the Content-Security-Policy:
  *   dataUrl — catalog, translations, commentaries; relative ("data/") means
- *             beside the page, and from disk beside auth.siteUrl; empty means
+ *             beside the page, and from disk beside siteUrl; empty means
  *             the page downloads nothing (the demo: files only);
- *   apiUrl  — the discussions API;
- *   auth.issuer — sign-in (Cognito, or the local stub).
+ *   apiUrl  — the discussions API and its sign-in.
  *
  * --out DIR puts the result somewhere other than build/.
  *
  * Addresses: config/build.json, or --config <file>; any of them overridden by
- * a flag (--data-url, --api-url, --auth-issuer, --auth-client-id, --site-url)
- * or an environment variable (BIBLE_DATA_URL, BIBLE_API_URL, BIBLE_AUTH_ISSUER,
- * BIBLE_AUTH_CLIENT_ID, BIBLE_SITE_URL). Flag beats environment beats file.
+ * a flag (--data-url, --api-url, --site-url) or an environment variable
+ * (BIBLE_DATA_URL, BIBLE_API_URL, BIBLE_SITE_URL). Flag beats environment
+ * beats file.
  *
  * The version is package.json's and nowhere else.
  */
@@ -71,12 +70,7 @@ export async function readConfig({ args = argv, env = process.env } = {}) {
     dev: base.dev === true,
     dataUrl: pick('--data-url', 'BIBLE_DATA_URL', base.dataUrl ?? ''),
     apiUrl: pick('--api-url', 'BIBLE_API_URL', base.apiUrl ?? ''),
-    auth: {
-      issuer: pick('--auth-issuer', 'BIBLE_AUTH_ISSUER', base.auth?.issuer ?? ''),
-      clientId: pick('--auth-client-id', 'BIBLE_AUTH_CLIENT_ID', base.auth?.clientId ?? ''),
-      providers: base.auth?.providers ?? ['google', 'apple', 'microsoft'],
-      siteUrl: pick('--site-url', 'BIBLE_SITE_URL', base.auth?.siteUrl ?? ''),
-    },
+    siteUrl: pick('--site-url', 'BIBLE_SITE_URL', base.siteUrl ?? ''),
   };
   validateConfig(config, file);
   return config;
@@ -99,11 +93,7 @@ export function validateConfig(config, file = 'config') {
     if (!config.dataUrl.endsWith('/')) throw new Error(`${file}: dataUrl must end with "/": ${config.dataUrl}`);
   } else check('dataUrl', config.dataUrl, true);
   check('apiUrl', config.apiUrl, true);
-  check('auth.issuer', config.auth.issuer, true);
-  check('auth.siteUrl', config.auth.siteUrl, true);
-  for (const provider of config.auth.providers) {
-    if (!['google', 'apple', 'microsoft'].includes(provider)) throw new Error(`${file}: unknown sign-in provider ${provider}`);
-  }
+  check('siteUrl', config.siteUrl, true);
 }
 
 /** "data/" — read beside the page; "" and absolute addresses are not relative. */
@@ -116,8 +106,8 @@ const isRelative = (value) => !!value && !/^[a-z][a-z0-9+.-]*:/i.test(value);
  */
 export function connectSources(config) {
   const origins = new Set();
-  const data = isRelative(config.dataUrl) ? config.auth.siteUrl : config.dataUrl;
-  for (const value of [data, config.apiUrl, config.auth.issuer]) if (value) origins.add(new URL(value).origin);
+  const data = isRelative(config.dataUrl) ? config.siteUrl : config.dataUrl;
+  for (const value of [data, config.apiUrl]) if (value) origins.add(new URL(value).origin);
   return [...origins];
 }
 
@@ -150,7 +140,7 @@ async function bundle(entry) {
     charset: 'utf8',
     define: {
       __APP_VERSION__: JSON.stringify(release.label),
-      __CONFIG__: JSON.stringify({ dataUrl: config.dataUrl, apiUrl: config.apiUrl, auth: config.auth }),
+      __CONFIG__: JSON.stringify({ dataUrl: config.dataUrl, apiUrl: config.apiUrl, siteUrl: config.siteUrl }),
     },
     write: false,
   });

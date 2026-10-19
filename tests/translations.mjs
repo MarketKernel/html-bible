@@ -1,7 +1,8 @@
 /**
  * The translation files in data/translations/: format, counts, the
  * noncanonical ranges against versification/synodal.ts, control verses, clean
- * text, and the Synodal ⇄ KJV mapping checked against both texts.
+ * text, the Synodal ⇄ KJV mapping checked against both texts, and the other
+ * translations, each in the KJV's shape.
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -9,7 +10,17 @@ import { gunzipSync } from 'node:zlib';
 import { checker, load, needData, root } from '../tools/load.mjs';
 import { textProblems, validateTranslation } from '../tools/translations/validate.mjs';
 
-needData('translations', 'translations/en-kjv.json.gz', 'translations/ru-synodal.json.gz');
+// The other translations: [id, verses left empty as the edition prints them, John 3:16].
+const OTHERS = [
+  ['en-asv', 16, 'For God so loved the world, that he gave his only begotten Son'],
+  ['en-bsb', 16, 'For God so loved the world that He gave His one and only Son'],
+  ['en-darby', 3, 'For God so loved the world, that he gave his only-begotten Son'],
+  ['en-web', 4, 'For God so loved the world, that he gave his only born Son'],
+  ['en-ylt', 0, 'for God did so love the world'],
+  ['uk-ogienko', 0, 'Так бо Бог полюбив світ'],
+];
+
+needData('translations', 'translations/en-kjv.json.gz', 'translations/ru-synodal.json.gz', ...OTHERS.map(([id]) => `translations/${id}.json.gz`));
 const { check, done } = checker();
 const { versification } = await load('core/versification/map');
 const { KJV_COUNTS } = await load('core/versification/kjv-counts');
@@ -147,5 +158,34 @@ for (const b of kjv.books) {
 }
 check('mapping fits both texts', problems.slice(0, 5), []);
 check('KJV verses the Synodal lacks', missing, ['SNG 1:1']);
+
+// The other translations: versification 'kjv' is identity, so each must have
+// exactly the KJV's chapters and verses.
+const others = Object.fromEntries(OTHERS.map(([id]) => [id, read(`${id}.json.gz`)]));
+for (const [id, emptyVerses, john] of OTHERS) {
+  const t = others[id];
+  check(`${id}: validator`, validateTranslation(t), []);
+  check(`${id}: header`, [t.id, t.lang, t.versification, t.license], [id, id.slice(0, 2), 'kjv', 'Public domain']);
+  check(`${id}: canonical order`, t.books.map((b) => b.id), [...CANONICAL_BOOKS]);
+  check(`${id}: the KJV's shape`, Object.fromEntries(t.books.map((b) => [b.id, b.chapters.map((c) => c.length)])), KJV_COUNTS);
+  check(`${id}: empty verses`, t.books.reduce((n, b) => n + b.chapters.reduce((m, c) => m + c.filter((s) => !s).length, 0), 0), emptyVerses);
+  check(`${id}: John 3:16`, verse(t, 'JHN', 3, 16).startsWith(john), true);
+}
+const linkNames = [kjv, syn, ...Object.values(others)].map((t) => t.linkName.toLowerCase());
+check('link names differ', new Set(linkNames).size, linkNames.length);
+check('WEB: the doxology of Romans moved to 16:25–27', [others['en-web'].books.find((b) => b.id === 'ROM').chapters[13].length, verse(others['en-web'], 'ROM', 16, 25).startsWith('Now to him who is able')], [23, true]);
+check('Darby: no brackets around the doubtful John 5:3–4', /[[\]]/.test(verse(others['en-darby'], 'JHN', 5, 3) + verse(others['en-darby'], 'JHN', 5, 4)), false);
+check('YLT: its added words as [ ]', verse(others['en-ylt'], 'PSA', 23, 1).includes('[is]'), true);
+check('ASV: Selah without the stray bracket', verse(others['en-asv'], 'PSA', 3, 2).endsWith('Selah'), true);
+const og = others['uk-ogienko'];
+check('Ohienko: the title of Ps 51 opens verse 1', [verse(og, 'PSA', 51, 1).startsWith('Для дириґетна хору'), verse(og, 'PSA', 51, 1).includes('Помилуй мене, Боже')], [true, true]);
+check('Ohienko: Ps 51:19 is the last verse', verse(og, 'PSA', 51, 19).length > 0 && verse(og, 'PSA', 51, 20) === undefined, true);
+check('Ohienko: 1 Sam 21:1 closes 20:42', verse(og, '1SA', 20, 42).endsWith('а Йонатан пішов до міста.'), true);
+check('Ohienko: 3 John 15 closes verse 14', [verse(og, '3JN', 1, 14).endsWith('Амінь.'), verse(og, '3JN', 1, 15)], [true, undefined]);
+check('Ohienko: Ukrainian book names', [book(og, 'GEN').name, book(og, 'JHN').short], ['Буття', 'Ів']);
+
+// A new reader is offered the first translation of their language.
+const catalog = JSON.parse(readFileSync(join(root, 'data', 'catalog.json'), 'utf8'));
+check('catalog: the KJV and the Synodal first', catalog.translations.slice(0, 2).map((t) => t.id), ['en-kjv', 'ru-synodal']);
 
 done('translations');

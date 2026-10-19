@@ -2,10 +2,5 @@
   "dev": true,
   "dataUrl": "http://localhost:8787/data/",
   "apiUrl": "http://localhost:8787/v1/",
-  "auth": {
-    "issuer": "http://localhost:8787/",
-    "clientId": "html-bible-dev",
-    "providers": ["google", "apple", "microsoft"],
-    "siteUrl": "http://localhost:8787/"
-  }
+  "siteUrl": "http://localhost:8787/"
 }

@@ -1,0 +1,63 @@
+{
+  "name": "auth-login-wrong",
+  "description": "A wrong password and an unknown login get the same 401 invalid_credentials.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/login",
+        "body": {
+          "login": "anna",
+          "password": "not-the-password"
+        }
+      },
+      "response": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "invalid_credentials",
+            "message": "Wrong login or password"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/login",
+        "body": {
+          "login": "nobody",
+          "password": "not-the-password"
+        }
+      },
+      "response": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "invalid_credentials",
+            "message": "Wrong login or password"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/login",
+        "body": {
+          "login": "anna"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"password\" is required",
+            "field": "password"
+          }
+        }
+      }
+    }
+  ]
+}

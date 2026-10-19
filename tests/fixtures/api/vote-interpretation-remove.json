@@ -7,7 +7,7 @@
         "method": "PUT",
         "path": "/v1/votes/interpretation/01JAS000000000000000000T01",
         "headers": {
-          "Authorization": "Bearer <jwt:elena>"
+          "Authorization": "Bearer <token:elena>"
         },
         "body": {
           "value": null

@@ -1,11 +1,11 @@
 /**
- * Routes, the Markdown subset (with XSS vectors), search, package checks, PKCE
+ * Routes, the Markdown subset (with XSS vectors), search, package checks
  * and the rating helpers — the DOM-free core.
  */
 import { checker, load } from '../tools/load.mjs';
 
 const { check, done } = checker();
-const C = await load('core/route', 'core/markdown', 'core/search', 'core/pack', 'core/auth', 'core/rating');
+const C = await load('core/route', 'core/markdown', 'core/search', 'core/pack', 'core/discussion-file', 'core/time', 'core/rating');
 
 /* ---------------- routes ---------------- */
 const route = (hash) => C.parseRoute(hash);
@@ -143,17 +143,42 @@ check('pack: backwards ref rejected', kind({ ...commentary, entries: [{ ref: 'JH
 check('pack: manifest path traversal', kind({ ...commentary, entries: undefined, books: [{ id: 'GEN', url: '../x.json', bytes: 1, sha256: '', entries: 1 }] }), 'The commentary’s book list is broken.');
 check('canonical ref', [C.isCanonicalRef('JHN.3.16'), C.isCanonicalRef('1CO.13.4-1CO.13.7'), C.isCanonicalRef('JHN.3.16-ROM.1.1'), C.isCanonicalRef('TOB.1.1')], [true, true, false, false]);
 
-/* ---------------- auth ---------------- */
-// RFC 7636, appendix B
-check('pkce challenge', await C.codeChallenge('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'), 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM');
-const url = new URL(C.authorizeUrl({ issuer: 'http://localhost:8787', clientId: 'c', redirectUri: 'http://localhost:8787/', provider: 'apple', state: 's', challenge: 'ch' }));
-check('authorize url', [url.pathname, url.searchParams.get('identity_provider'), url.searchParams.get('code_challenge_method')], ['/oauth2/authorize', 'SignInWithApple', 'S256']);
-check('token url', C.tokenUrl('https://auth.example.com'), 'https://auth.example.com/oauth2/token');
-const tokens = C.parseTokenResponse({ access_token: 'a', id_token: 'i', refresh_token: 'r', expires_in: 3600 }, 1000);
-check('tokens', tokens, { accessToken: 'a', idToken: 'i', refreshToken: 'r', expiresAt: 3_601_000 });
-check('needs refresh', [C.needsRefresh(tokens, 1000), C.needsRefresh(tokens, 3_550_000)], [false, true]);
-const jwt = `x.${Buffer.from(JSON.stringify({ name: 'Иван', exp: 5 })).toString('base64url')}.y`;
-check('jwt claims', C.jwtClaims(jwt), { name: 'Иван', exp: 5 });
+/* ---------------- profile routes ---------------- */
+check('route: profile', [route('#/profile'), C.formatRoute({ name: 'profile' })], [{ name: 'profile' }, '#/profile']);
+check('route: a member', route('#/users/2764d8bf-5142-5be3-b585-4991ff43a045'), { name: 'user', id: '2764d8bf-5142-5be3-b585-4991ff43a045' });
+check('route: an invitation', [route('#/join/1-7-K3M9Q-T8ZR2'), C.formatRoute({ name: 'join', code: '1-7-K3M9Q-T8ZR2' })], [{ name: 'join', code: '1-7-K3M9Q-T8ZR2' }, '#/join/1-7-K3M9Q-T8ZR2']);
+check('route: not an invitation', [route('#/join/'), route('#/join/<script>')].map((r) => r.name), ['unknown', 'unknown']);
+
+/* ---------------- time ---------------- */
+// Moscow is UTC+3 all year: 09:05 UTC is 12:05 there, and 22:30 UTC the day before is already today.
+const nowUtc = new Date('2026-10-19T12:00:00Z');
+const msk = (iso, lang = 'ru') => C.formatTime(iso, lang, nowUtc, 'Europe/Moscow');
+check('time: today', [msk('2026-10-19T09:05:00Z'), msk('2026-10-18T22:30:00Z')], ['12:05', '01:30']);
+check('time: this year', msk('2026-03-05T11:05:00Z'), '5 мар., 14:05');
+check('time: earlier', msk('2025-03-05T11:05:00Z'), '5 мар. 2025 г., 14:05');
+check('time: English', msk('2026-03-05T11:05:00Z', 'en'), 'Mar 5, 02:05 PM');
+check('time: broken', msk('yesterday'), '');
+check('time: full, with the zone', C.fullTime('2026-10-19T09:05:00Z', 'ru', 'Europe/Moscow'), '19 октября 2026 г. в 12:05 GMT+3');
+check('day of the server: its midnight in the reader\'s zone', C.formatDay('2026-10-20', 'ru', 'Europe/Moscow'), '20 октября в 03:00');
+
+/* ---------------- discussion file ---------------- */
+const full = {
+  question: { id: 'Q', title: { orig: 'en', en: 'Is it so?', ru: 'Так ли?' } },
+  arguments: [{ id: 'A' }],
+  verses: [{ id: 'V', votes: { pro: 2, con: 1, none: 0, mine: 1 } }],
+  interpretations: [{ id: 'T', votes: { up: 1, down: 0, mine: null } }, { id: 'T2', votes: { up: 0, down: 0 } }],
+};
+const saved = C.discussionFile(full, 'https://api.example.org/v1/', new Date('2026-10-18T12:00:00Z'));
+check('discussion file: header', [saved.format, saved.formatVersion, saved.exportedAt, saved.source], ['html-bible/discussion', 1, '2026-10-18T12:00:00.000Z', 'https://api.example.org/v1/']);
+check('discussion file: no one\'s own votes', [saved.verses[0].votes, saved.interpretations[0].votes], [{ pro: 2, con: 1, none: 0 }, { up: 1, down: 0 }]);
+check('discussion file: the rest as it was', [saved.question, saved.arguments, saved.interpretations[1]], [full.question, full.arguments, full.interpretations[1]]);
+check('discussion file: the screen\'s data untouched', full.verses[0].votes.mine, 1);
+const day = new Date('2026-10-18T12:00:00Z');
+check('file name', [C.discussionFileName('Is the Trinity biblical?', day), C.discussionFileName('Соответствует ли учение о Троице Библии?', day), C.discussionFileName('!!!', day)], [
+  'discussion-is-the-trinity-biblical-2026-10-18.json',
+  'discussion-соответствует-ли-учение-о-троице-библии-2026-10-18.json',
+  'discussion-2026-10-18.json',
+]);
 
 /* ---------------- rating ---------------- */
 check('tilt', [C.tilt(50), C.tilt(-200), C.tilt(null)], [10, -20, 0]);

@@ -20,6 +20,7 @@ import { installedPacks, loadInstalled } from './packs';
 import { openOnboarding, openPackFile } from './packs-view';
 import { clearSelection, openReader, readerState, step } from './reader';
 import { openSearch } from './search-view';
+import { openProfile, openUser } from './profile-view';
 import { openSettings } from './settings-view';
 import { apply, settings } from './state';
 import { anyDialogOpen, menu, toast } from './ui';
@@ -66,6 +67,21 @@ async function route(): Promise<void> {
     case 'settings':
       setTab(null);
       return openSettings(view);
+    case 'profile':
+      setTab(null);
+      return openProfile(view);
+    case 'user':
+      setTab('discussions');
+      return openUser(view, r.id);
+    case 'join': {
+      // An invitation link: the discussions, with the new-account form over them.
+      setTab('discussions');
+      await openDiscussions(view);
+      const user = currentUser();
+      if (user) toast(t('auth', 'You are signed in already, as {name}.', { name: user.displayName }));
+      else signInDialog('up', r.code);
+      return;
+    }
     case 'unknown': {
       setTab('bible');
       toast(t('app', 'Not a verse or a page of the app: {text}', { text: r.text.slice(0, 60) }), 'error');
@@ -104,7 +120,7 @@ function setupTopbar(): void {
     const user = currentUser();
     if (!user) return signInDialog();
     menu(account, [
-      { label: user.displayName, icon: 'user', action: () => (location.hash = '#/settings') },
+      { label: t('topbar', 'Profile'), icon: 'user', action: () => (location.hash = formatRoute({ name: 'profile' })) },
       { label: t('topbar', 'Sign out'), icon: 'logout', action: () => void signOut() },
     ]);
   });

@@ -11,7 +11,7 @@
         "status": 200,
         "body": {
           "ok": true,
-          "version": "0.1.0-stub"
+          "version": "0.1.0"
         }
       }
     }

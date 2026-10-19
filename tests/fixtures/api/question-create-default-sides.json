@@ -7,7 +7,7 @@
         "method": "POST",
         "path": "/v1/questions",
         "headers": {
-          "Authorization": "Bearer <jwt:elena>"
+          "Authorization": "Bearer <token:elena>"
         },
         "body": {
           "lang": "ru",

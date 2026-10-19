@@ -18,6 +18,8 @@ export interface DialogOptions {
   actions?: Node[];
   wide?: boolean;
   onClose?: () => void;
+  /** False while the dialog must stay open, e.g. while its form is being sent. */
+  canClose?: () => boolean;
 }
 
 export interface DialogHandle {
@@ -30,6 +32,7 @@ const open: DialogHandle[] = [];
 export function dialog(options: DialogOptions): DialogHandle {
   const previous = document.activeElement as HTMLElement | null;
   const close = () => {
+    if (options.canClose && !options.canClose()) return;
     backdrop.remove();
     document.removeEventListener('keydown', onKey, true);
     const at = open.indexOf(handle);

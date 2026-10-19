@@ -12,9 +12,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - uses: actions/setup-python@v5
+      # The server (server/, Rust): the runner has rustup; the build is cached.
+      - uses: Swatinem/rust-cache@v2
         with:
-          python-version: '3.11'
+          workspaces: server
       - run: npm ci
       - name: The tag matches package.json
         run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"

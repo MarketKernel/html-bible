@@ -1,0 +1,146 @@
+{
+  "name": "auth-register-invalid",
+  "description": "Login, password and invitation rules: 400 validation_error with the field.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "login": "ab",
+          "password": "long enough"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"login\" must be 3–32 characters: letters a–z, digits, \".\", \"_\" or \"-\", starting with a letter or digit",
+            "field": "login"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "login": "-maria",
+          "password": "long enough"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"login\" must be 3–32 characters: letters a–z, digits, \".\", \"_\" or \"-\", starting with a letter or digit",
+            "field": "login"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "login": "maria",
+          "password": "short"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"password\" must be 8–128 characters",
+            "field": "password"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "login": "maria-kk",
+          "password": "Maria-KK"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"password\" must differ from the login",
+            "field": "password"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "password": "long enough"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"login\" must be 3–32 characters: letters a–z, digits, \".\", \"_\" or \"-\", starting with a letter or digit",
+            "field": "login"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "login": "maria",
+          "password": "long enough"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"invite\" is required: an invitation code",
+            "field": "invite"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/register",
+        "body": {
+          "invite": "not a code",
+          "login": "maria",
+          "password": "long enough"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "validation_error",
+            "message": "\"invite\" is not an invitation code",
+            "field": "invite"
+          }
+        }
+      }
+    }
+  ]
+}

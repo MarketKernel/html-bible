@@ -1,0 +1,42 @@
+[package]
+name = "html-bible-server"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.82"
+publish = false
+license = "MIT"
+description = "The discussions API of html-bible: one Lambda in AWS, the same code as a local server"
+
+[features]
+default = ["local", "net"]
+# The local server (bin/local.rs): HTTP on this computer, static files, the JSON store.
+local = ["dep:tiny_http"]
+# The Lambda (bin/lambda.rs): the runtime API, DynamoDB over HTTPS with SigV4.
+aws = ["net"]
+# HTTPS out: OpenAI (and AWS in the Lambda).
+net = ["dep:ureq"]
+
+[dependencies]
+base64 = "0.22"
+getrandom = "0.2"
+hmac = "0.12"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+sha2 = "0.10"
+tiny_http = { version = "0.12", optional = true }
+ureq = { version = "2", optional = true, default-features = false, features = ["tls", "json"] }
+
+[[bin]]
+name = "local"
+path = "src/bin/local.rs"
+required-features = ["local"]
+
+[[bin]]
+name = "lambda"
+path = "src/bin/lambda.rs"
+required-features = ["aws"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

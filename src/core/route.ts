@@ -3,7 +3,8 @@
  *
  * A verse link is the readable reference itself (#Synodal_Mat3-3?notes=0) or
  * free form (#Мф%202:3); the app's own screens start with "/" so they are never
- * taken for a book (#/discussions/…, #/compare/…, #/search?q=…, #/settings).
+ * taken for a book (#/discussions/…, #/compare/…, #/search?q=…, #/settings,
+ * #/profile, #/users/<id>, #/join/<invitation code>).
  */
 
 import { formatLink, type ParsedRef, parseLink, parseRef } from './refs';
@@ -16,6 +17,9 @@ export type Route =
   | { name: 'discussions'; tag?: string }
   | { name: 'discussion'; id: string; argument?: string; verse?: string }
   | { name: 'settings' }
+  | { name: 'profile' }
+  | { name: 'user'; id: string }
+  | { name: 'join'; code: string }
   | { name: 'unknown'; text: string };
 
 function splitQuery(text: string): [string, URLSearchParams] {
@@ -47,6 +51,10 @@ export function parseRoute(hash: string): Route {
       if (ref) return { name: 'compare', ref };
     }
     if (first === 'settings' && !second) return { name: 'settings' };
+    if (first === 'profile' && !second) return { name: 'profile' };
+    if (first === 'users' && second && ID.test(second) && !third) return { name: 'user', id: second };
+    // An invitation link: #/join/1-7-K3M9Q-T8ZR2 (spaces are kept for the code's own parser).
+    if (first === 'join' && second && segments.length === 2 && /^[\w -]{5,40}$/.test(second)) return { name: 'join', code: second };
     if (first === 'search') {
       const route: Route = { name: 'search', q: query.get('q') ?? '' };
       const scope = query.get('in');
@@ -110,6 +118,12 @@ export function formatRoute(route: Route): string {
       return `#/discussions/${route.id}`;
     case 'settings':
       return '#/settings';
+    case 'profile':
+      return '#/profile';
+    case 'user':
+      return `#/users/${route.id}`;
+    case 'join':
+      return `#/join/${encodeURIComponent(route.code)}`;
     case 'unknown':
       return `#${encodeURIComponent(route.text)}`;
   }

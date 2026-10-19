@@ -7,7 +7,7 @@
         "method": "PUT",
         "path": "/v1/votes/verse/01JAS000000000000000000V02",
         "headers": {
-          "Authorization": "Bearer <jwt:mikhail>"
+          "Authorization": "Bearer <token:mikhail>"
         },
         "body": {
           "value": 1

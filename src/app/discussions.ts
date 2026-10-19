@@ -19,22 +19,26 @@
 import { type Argument, type ArgumentVerse, type Interpretation, localized, type LocalizedText, type Outcome, type Question, type QuestionFull, type Tallies, type Tally, type VerseTag, type VoteValue } from '../core/api-types';
 import { bookInfo, type BookId } from '../core/books';
 import { type CanonVerse, compareKeys, keyOf, parseKey, rangeToNative, refToRanges, verseText } from '../core/canon';
+import { CONFIG } from '../core/config';
+import { discussionFile, discussionFileName } from '../core/discussion-file';
 import { t, tn } from '../core/i18n';
 import { formatHuman, parseRefs, partsFromVerses } from '../core/refs';
 import { tallyLean, tilt } from '../core/rating';
 import { formatRoute } from '../core/route';
 import type { RefRange, Translation } from '../core/types';
 import { api, ApiError, serverUp } from './api';
-import { authAvailable, currentUser, onUserChange, signInDialog, updateUserName } from './auth-service';
+import { authAvailable, currentUser, signInDialog } from './auth-service';
 import { get, put } from './db';
 import { clear, h, icon } from './dom';
 import { editor } from './editor';
+import { download } from './my-comments';
 import { openPanel } from './panel';
+import { personLink, when } from './people';
 import { installedPacks, packMeta, translation, translationNow } from './packs';
 import { readerState, refreshMarkers } from './reader';
 import { renderMarkdown } from './render-md';
 import { settings, uiLang } from './state';
-import { anyDialogOpen, askText, confirmDialog, dialog, toast } from './ui';
+import { anyDialogOpen, confirmDialog, dialog, toast } from './ui';
 
 const text = (value: LocalizedText | undefined) => localized(value, uiLang());
 
@@ -167,36 +171,6 @@ function requireSignIn(): boolean {
   return false;
 }
 
-/** At first sign-in the user chooses the public name shown in discussions. */
-async function ensureName(): Promise<void> {
-  const user = currentUser();
-  if (!user) return;
-  const flag = `html-bible.named.${user.id}`;
-  try {
-    if (localStorage.getItem(flag)) return;
-  } catch {
-    return;
-  }
-  const name = await askText(t('discussions', 'Your name in discussions'), t('discussions', 'Others will see it next to what you write.'), user.displayName);
-  if (name && name !== user.displayName) {
-    try {
-      const updated = await api.rename(name.slice(0, 40));
-      updateUserName(updated.displayName ?? name);
-    } catch (error) {
-      toast((error as Error).message, 'error');
-      return;
-    }
-  }
-  try {
-    localStorage.setItem(flag, '1');
-  } catch {
-    // Asked again next time; no harm.
-  }
-}
-
-onUserChange((user) => {
-  if (user) void ensureName();
-});
 
 function scaleSvg(lean: number | null): SVGSVGElement {
   const NS = 'http://www.w3.org/2000/svg';
@@ -205,22 +179,25 @@ function scaleSvg(lean: number | null): SVGSVGElement {
     for (const [k, v] of Object.entries(attrs)) element.setAttribute(k, v);
     return element;
   };
-  const svg = make('svg', { viewBox: '0 0 200 110', role: 'img' }) as SVGSVGElement;
+  // The pivot sits low enough that the raised end, 72 × sin(MAX_TILT) ≈ 25 above
+  // it at full tilt, stays inside the picture; the lowered pan hangs 52 below its end.
+  const Y = 32;
+  const svg = make('svg', { viewBox: '0 0 200 124', role: 'img' }) as SVGSVGElement;
   // The beam tips toward the heavier pan: the first position on the left goes down when lean > 0.
   const angle = -tilt(lean);
-  svg.appendChild(make('path', { d: 'M100 22 L100 100 M70 100 H130', stroke: 'currentColor', 'stroke-width': '3', fill: 'none', opacity: '0.5' }));
-  const beam = make('g', { transform: `rotate(${angle} 100 22)` });
-  beam.appendChild(make('path', { d: 'M28 22 H172', stroke: 'currentColor', 'stroke-width': '3', 'stroke-linecap': 'round' }));
+  svg.appendChild(make('path', { d: `M100 ${Y} L100 114 M70 114 H130`, stroke: 'currentColor', 'stroke-width': '3', fill: 'none', opacity: '0.5' }));
+  const beam = make('g', { transform: `rotate(${angle} 100 ${Y})` });
+  beam.appendChild(make('path', { d: `M28 ${Y} H172`, stroke: 'currentColor', 'stroke-width': '3', 'stroke-linecap': 'round' }));
   const pan = (x: number, color: string) => {
-    const g = make('g', { transform: `rotate(${-angle} ${x} 22)` });
-    g.appendChild(make('path', { d: `M${x} 22 L${x - 18} 58 M${x} 22 L${x + 18} 58`, stroke: 'currentColor', 'stroke-width': '1.2', opacity: '0.6' }));
-    g.appendChild(make('path', { d: `M${x - 22} 58 Q${x} 74 ${x + 22} 58 Z`, fill: color }));
+    const g = make('g', { transform: `rotate(${-angle} ${x} ${Y})` });
+    g.appendChild(make('path', { d: `M${x} ${Y} L${x - 18} ${Y + 36} M${x} ${Y} L${x + 18} ${Y + 36}`, stroke: 'currentColor', 'stroke-width': '1.2', opacity: '0.6' }));
+    g.appendChild(make('path', { d: `M${x - 22} ${Y + 36} Q${x} ${Y + 52} ${x + 22} ${Y + 36} Z`, fill: color }));
     return g;
   };
   beam.appendChild(pan(28, 'var(--pro)'));
   beam.appendChild(pan(172, 'var(--con)'));
   svg.appendChild(beam);
-  svg.appendChild(make('circle', { cx: '100', cy: '22', r: '4', fill: 'currentColor' }));
+  svg.appendChild(make('circle', { cx: '100', cy: String(Y), r: '4', fill: 'currentColor' }));
   return svg;
 }
 
@@ -297,6 +274,8 @@ export async function openDiscussions(container: HTMLElement, tag?: string): Pro
         'a',
         { class: 'q-card', href: formatRoute({ name: 'discussion', id: q.id }) },
         h('h3', null, text(q.title).text),
+        // Plain text here: the card is a link already.
+        h('div', { class: 'meta byline' }, q.author?.displayName ?? '', ' · ', when(q.createdAt)),
         h(
           'div',
           { class: 'meta' },
@@ -365,8 +344,14 @@ function renderQuestion(page: HTMLElement, data: QuestionFull, focus: Focus, rel
   if (data.arguments.length === 1) openArguments.add(data.arguments[0]!.id);
 
   page.append(
-    h('p', null, h('a', { href: '#/discussions' }, '← ', t('discussions', 'All topics'))),
+    h(
+      'div',
+      { class: 'row topic-bar' },
+      h('a', { class: 'grow', href: '#/discussions' }, '← ', t('discussions', 'All topics')),
+      h('button', { type: 'button', class: 'button small', title: t('discussions', 'The topic with its subtopics, verses, ratings and interpretations, in both languages'), on: { click: () => saveDiscussion(data) } }, icon('download'), t('discussions', 'Save as JSON')),
+    ),
     h('h1', null, text(q.title).text),
+    h('p', { class: 'meta byline' }, personLink(q.author), ' · ', when(q.createdAt, q.updatedAt)),
     h('div', { class: 'md' }, localizedNodes(q.summaryMd, true)),
     h('div', { class: 'positions' }, h('span', { class: 'position pro' }, h('span', { class: 'side-dot pro' }), text(q.sides.pro).text), h('span', { class: 'vs' }, t('discussions', 'or')), h('span', { class: 'position con' }, h('span', { class: 'side-dot con' }), text(q.sides.con).text)),
     h('div', { class: 'scales' }, scaleCard(t('discussions', 'Users'), q.tally?.users, q.sides), scaleCard(t('discussions', 'AI'), q.tally?.ai, q.sides, q.tally?.aiStatus === 'pending')),
@@ -382,6 +367,12 @@ function renderQuestion(page: HTMLElement, data: QuestionFull, focus: Focus, rel
   if (focus.verse) requestAnimationFrame(() => document.getElementById(`v-${focus.verse}`)?.scrollIntoView({ block: 'center' }));
 }
 
+/** The topic as a JSON file (core/discussion-file.ts), as it is on the screen now. */
+function saveDiscussion(data: QuestionFull): void {
+  const file = discussionFile(data, CONFIG.apiUrl);
+  download(new Blob([`${JSON.stringify(file, null, 2)}\n`], { type: 'application/json' }), discussionFileName(text(data.question.title).text));
+}
+
 function argumentBlock(q: Question, argument: Argument, verses: ArgumentVerse[], interpretations: Interpretation[], focusVerse: string | undefined, reload: () => void): HTMLElement {
   const tally: Tallies | undefined = argument.tally;
   const block = h(
@@ -391,6 +382,7 @@ function argumentBlock(q: Question, argument: Argument, verses: ArgumentVerse[],
     h(
       'div',
       { class: 'argument-body' },
+      h('p', { class: 'meta byline' }, personLink(argument.author), ' · ', when(argument.createdAt, argument.updatedAt)),
       text(argument.summaryMd).text ? h('div', { class: 'md argument-summary' }, localizedNodes(argument.summaryMd, true)) : null,
       verses.length ? verses.map((v) => verseCard(q, v, interpretations.filter((i) => i.verseId === v.id), focusVerse === v.id, reload)) : h('p', { class: 'hint' }, t('discussions', 'No verses yet. Add the first one.')),
       h('button', { type: 'button', class: 'button', on: { click: () => addVerses(q, argument, reload) } }, icon('plus'), t('discussions', 'Add a verse')),
@@ -486,7 +478,7 @@ function verseCard(q: Question, verse: ArgumentVerse, interpretations: Interpret
           )
         : h('span'),
       h('span', { class: 'spacer' }),
-      h('span', { class: 'hint' }, t('discussions', 'added by {name}', { name: verse.author?.displayName ?? '' })),
+      h('span', { class: 'hint byline' }, t('discussions', 'added by'), ' ', personLink(verse.author), ' · ', when(verse.createdAt)),
       canDelete
         ? h(
             'button',
@@ -524,7 +516,7 @@ function interpretationBlock(q: Question, verse: ArgumentVerse, item: Interpreta
     h(
       'div',
       { class: 'point-foot' },
-      h('span', null, item.author.displayName),
+      h('span', { class: 'byline' }, personLink(item.author), ' · ', when(item.createdAt, item.updatedAt)),
       h('span', { class: 'spacer' }),
       item.deleted ? null : rating(item, item.author.id === me, reload),
       item.deleted ? null : h('button', { type: 'button', class: 'button ghost small', on: { click: () => newInterpretation(q, verse, item.side === 'pro' ? 'con' : 'pro', item, reload) } }, t('discussions', 'Reply')),
@@ -589,6 +581,42 @@ function rating(item: Interpretation, own: boolean, reload: () => void): HTMLEle
 function formError(error: unknown): string {
   if (error instanceof ApiError && error.status === 422) return t('discussions', 'Not accepted: {reason}', { reason: error.reason ?? error.message });
   return (error as Error).message;
+}
+
+interface Sending {
+  element: HTMLElement;
+  busy: () => boolean;
+  run: <T>(task: () => Promise<T>) => Promise<T>;
+}
+
+/**
+ * A published text goes through moderation and translation before the server answers, which
+ * takes seconds and sometimes much longer. Meanwhile the form shows a running bar and says
+ * what is happening, and it is locked so the text can't be sent twice or the dialog closed
+ * on a request that will still be saved.
+ */
+function sending(): Sending {
+  const label = h('span', { class: 'hint' });
+  const element = h('div', { class: 'sending', role: 'status', hidden: true }, h('div', { class: 'progress running' }, h('div')), label);
+  let busy = false;
+  const run = async <T>(task: () => Promise<T>): Promise<T> => {
+    const box = element.closest('.dialog') ?? element;
+    const controls = [...box.querySelectorAll<HTMLInputElement | HTMLButtonElement>('input, textarea, select, button')].filter((c) => !c.disabled);
+    const slow = setTimeout(() => (label.textContent = t('discussions', 'Still checking: the text is moderated and translated. It can take up to a minute.')), 5000);
+    busy = true;
+    label.textContent = t('discussions', 'Checking the text…');
+    element.hidden = false;
+    for (const c of controls) c.disabled = true;
+    try {
+      return await task();
+    } finally {
+      clearTimeout(slow);
+      busy = false;
+      element.hidden = true;
+      for (const c of controls) c.disabled = false;
+    }
+  };
+  return { element, busy: () => busy, run };
 }
 
 /** Typed references («Ин 1:1; Рим 5:8-9») → canonical ranges, in the numbering of the translation being read. */
@@ -668,12 +696,15 @@ function newInterpretation(q: Question, verse: ArgumentVerse, sideName: 'pro' | 
   const sideSelect = h('select', { class: 'select' }, h('option', { value: 'pro' }, text(q.sides.pro).text), h('option', { value: 'con' }, text(q.sides.con).text));
   sideSelect.value = sideName;
   const error = h('p', { class: 'error' });
+  const send = sending();
   const submit = async () => {
+    if (send.busy()) return undefined;
     const body = ed.value();
     if (!body) return (error.textContent = t('discussions', 'Write the interpretation.'));
     if (ed.problem()) return (error.textContent = ed.problem() ?? '');
     try {
-      await api.addInterpretation(verse.id, { side: sideSelect.value as 'pro' | 'con', bodyMd: body, lang: uiLang(), ...(replyTo ? { replyTo: replyTo.id } : {}) });
+      error.textContent = '';
+      await send.run(() => api.addInterpretation(verse.id, { side: sideSelect.value as 'pro' | 'con', bodyMd: body, lang: uiLang(), ...(replyTo ? { replyTo: replyTo.id } : {}) }));
       handle.close();
       toast(t('discussions', 'Added. The AI is re-evaluating the verse.'));
       reload();
@@ -685,7 +716,8 @@ function newInterpretation(q: Question, verse: ArgumentVerse, sideName: 'pro' | 
   const handle = dialog({
     title: replyTo ? t('discussions', 'Reply') : t('discussions', 'Interpretation · {verse}', { verse: rangeLabel(verse.ref) }),
     wide: true,
-    body: h('div', null, h('label', { class: 'field' }, h('span', null, t('discussions', 'Column')), sideSelect), ed.element, error),
+    canClose: () => !send.busy(),
+    body: h('div', null, h('label', { class: 'field' }, h('span', null, t('discussions', 'Column')), sideSelect), ed.element, error, send.element),
     actions: [h('button', { type: 'button', class: 'button', on: { click: () => handle.close() } }, t('dialog', 'Cancel')), h('button', { type: 'button', class: 'button primary', on: { click: submit } }, t('discussions', 'Publish'))],
   });
 }
@@ -695,10 +727,13 @@ function newArgument(q: Question, reload: () => void, then?: (argument: Argument
   const title = h('input', { class: 'input', maxLength: 200 });
   const ed = editor('', { rows: 4, placeholder: t('discussions', 'What this subtopic is about (optional)') });
   const error = h('p', { class: 'error' });
+  const send = sending();
   const submit = async () => {
+    if (send.busy()) return undefined;
     if (!title.value.trim()) return (error.textContent = t('discussions', 'Give the subtopic a title.'));
     try {
-      const argument = await api.addArgument(q.id, { title: title.value.trim(), summaryMd: ed.value(), lang: uiLang() });
+      error.textContent = '';
+      const argument = await send.run(() => api.addArgument(q.id, { title: title.value.trim(), summaryMd: ed.value(), lang: uiLang() }));
       handle.close();
       openArguments.add(argument.id);
       if (then) then(argument);
@@ -711,7 +746,8 @@ function newArgument(q: Question, reload: () => void, then?: (argument: Argument
   const handle = dialog({
     title: t('discussions', 'New subtopic'),
     wide: true,
-    body: h('div', null, h('label', { class: 'field' }, h('span', null, t('discussions', 'Title, e.g. “The deity of Jesus”')), title), ed.element, error),
+    canClose: () => !send.busy(),
+    body: h('div', null, h('label', { class: 'field' }, h('span', null, t('discussions', 'Title, e.g. “The deity of Jesus”')), title), ed.element, error, send.element),
     actions: [h('button', { type: 'button', class: 'button', on: { click: () => handle.close() } }, t('dialog', 'Cancel')), h('button', { type: 'button', class: 'button primary', on: { click: submit } }, t('discussions', 'Publish'))],
   });
 }
@@ -724,16 +760,21 @@ function newQuestion(): void {
   const tags = h('input', { class: 'input', placeholder: t('discussions', 'theology, christology') });
   const ed = editor('', { rows: 4, placeholder: t('discussions', 'What exactly is being asked') });
   const error = h('p', { class: 'error' });
+  const send = sending();
   const submit = async () => {
+    if (send.busy()) return undefined;
     if (!title.value.trim()) return (error.textContent = t('discussions', 'Write the topic.'));
     try {
-      const q = await api.createQuestion({
-        title: title.value.trim(),
-        summaryMd: ed.value(),
-        sides: { pro: pro.value.trim() || t('discussions', 'For'), con: con.value.trim() || t('discussions', 'Against') },
-        tags: tags.value.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean).slice(0, 10),
-        lang: uiLang(),
-      });
+      error.textContent = '';
+      const q = await send.run(() =>
+        api.createQuestion({
+          title: title.value.trim(),
+          summaryMd: ed.value(),
+          sides: { pro: pro.value.trim() || t('discussions', 'For'), con: con.value.trim() || t('discussions', 'Against') },
+          tags: tags.value.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean).slice(0, 10),
+          lang: uiLang(),
+        }),
+      );
       handle.close();
       location.hash = formatRoute({ name: 'discussion', id: q.id });
     } catch (e) {
@@ -744,6 +785,7 @@ function newQuestion(): void {
   const handle = dialog({
     title: t('discussions', 'New topic'),
     wide: true,
+    canClose: () => !send.busy(),
     body: h(
       'div',
       null,
@@ -752,6 +794,7 @@ function newQuestion(): void {
       h('div', { class: 'row' }, h('label', { class: 'field grow' }, h('span', null, t('discussions', 'The first position')), pro), h('label', { class: 'field grow' }, h('span', null, t('discussions', 'The second position')), con)),
       h('label', { class: 'field' }, h('span', null, t('discussions', 'Tags, separated by commas')), tags),
       error,
+      send.element,
     ),
     actions: [h('button', { type: 'button', class: 'button', on: { click: () => handle.close() } }, t('dialog', 'Cancel')), h('button', { type: 'button', class: 'button primary', on: { click: submit } }, t('discussions', 'Publish'))],
   });

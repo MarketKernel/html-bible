@@ -2,7 +2,7 @@
  * Shared bits of the translation converters: book metadata from
  * src/core/books.ts, writing a gzipped translation, a short report.
  *
- * Not a CLI: imported by build-kjv.mjs, build-synodal.mjs and validate.mjs.
+ * Not a CLI: imported by the converters (build-*.mjs) and validate.mjs.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

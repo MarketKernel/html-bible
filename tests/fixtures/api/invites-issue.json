@@ -1,0 +1,81 @@
+{
+  "name": "invites-issue",
+  "description": "A member takes invitation codes (10, then more from the next 00:00 UTC) and sees each code with who used it.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/invites",
+        "headers": {
+          "Authorization": "Bearer <token:anna>"
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "seq": 1,
+          "code": "2-1-PHFF6-7X471"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/invites",
+        "headers": {
+          "Authorization": "Bearer <token:anna>"
+        }
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "seq": 2,
+          "code": "2-2-4B3EP-TNBX4"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/invites",
+        "headers": {
+          "Authorization": "Bearer <token:anna>"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "issued": 2,
+          "limit": 10,
+          "resetOn": null,
+          "available": 8,
+          "codes": [
+            {
+              "seq": 1,
+              "code": "2-1-PHFF6-7X471"
+            },
+            {
+              "seq": 2,
+              "code": "2-2-4B3EP-TNBX4"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/invites"
+      },
+      "response": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "unauthorized",
+            "message": "Sign-in required"
+          }
+        }
+      }
+    }
+  ]
+}

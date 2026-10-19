@@ -1,0 +1,56 @@
+{
+  "name": "invite-check",
+  "description": "Who invites, before registering; a code nobody issued is invalid.",
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/invites",
+        "headers": {
+          "Authorization": "Bearer <token:anna>"
+        }
+      },
+      "save": {
+        "code": "code"
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "seq": 1,
+          "code": "2-1-PHFF6-7X471"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/invites/{code}"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "inviter": {
+            "id": "2764d8bf-5142-5be3-b585-4991ff43a045",
+            "displayName": "Anna"
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/invites/2-9-ABCDE-FGHJK"
+      },
+      "response": {
+        "status": 403,
+        "body": {
+          "error": {
+            "code": "invalid_invite",
+            "message": "This invitation code is not valid",
+            "field": "invite"
+          }
+        }
+      }
+    }
+  ]
+}

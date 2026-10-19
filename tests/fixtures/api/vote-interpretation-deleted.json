@@ -7,7 +7,7 @@
         "method": "DELETE",
         "path": "/v1/interpretations/01JAS000000000000000000T02",
         "headers": {
-          "Authorization": "Bearer <jwt:david>"
+          "Authorization": "Bearer <token:david>"
         }
       },
       "response": {
@@ -23,7 +23,7 @@
         "method": "PUT",
         "path": "/v1/votes/interpretation/01JAS000000000000000000T02",
         "headers": {
-          "Authorization": "Bearer <jwt:sarah>"
+          "Authorization": "Bearer <token:sarah>"
         },
         "body": {
           "value": 1

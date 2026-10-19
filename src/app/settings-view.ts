@@ -5,7 +5,7 @@
 
 import { LANGUAGES, t, tn } from '../core/i18n';
 import type { Settings } from '../core/settings';
-import { authAvailable, currentUser, signInDialog, signOut } from './auth-service';
+import { authAvailable, currentUser, signInDialog } from './auth-service';
 import { clear, h, icon } from './dom';
 import { allComments, download, exportComments, importComments } from './my-comments';
 import { packsSection, pickFile } from './packs-view';
@@ -150,8 +150,19 @@ export async function openSettings(container: HTMLElement): Promise<void> {
         { class: 'settings-section' },
         h('h2', null, t('settings', 'Account for discussions')),
         user
-          ? h('div', { class: 'row' }, h('span', { class: 'grow' }, t('settings', 'Signed in as {name}', { name: user.displayName })), h('button', { type: 'button', class: 'button', on: { click: async () => { await signOut(); redraw(); } } }, icon('logout'), t('settings', 'Sign out')))
-          : h('div', { class: 'row' }, h('span', { class: 'grow hint' }, t('settings', 'Needed only to take part in discussions.')), h('button', { type: 'button', class: 'button', on: { click: signInDialog } }, t('settings', 'Sign in'))),
+          ? h(
+              'div',
+              { class: 'row' },
+              h('span', { class: 'grow' }, t('settings', 'Signed in as {name}', { name: user.displayName })),
+              h('a', { class: 'button', href: '#/profile' }, icon('user'), t('settings', 'Profile')),
+            )
+          : h(
+              'div',
+              { class: 'row' },
+              h('span', { class: 'grow hint' }, t('settings', 'Needed only to take part in discussions.')),
+              h('button', { type: 'button', class: 'button', on: { click: () => signInDialog('in') } }, t('settings', 'Sign in')),
+              h('button', { type: 'button', class: 'button', on: { click: () => signInDialog('up') } }, t('settings', 'Create an account')),
+            ),
       ),
     );
   }

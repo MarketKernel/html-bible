@@ -6,6 +6,7 @@
 #   data/catalog.json      the index of what can be downloaded (tools/translations/build-catalog.mjs)
 #   data/translations/, data/commentaries/
 #   _headers               config/cloudflare/_headers: CORS and no-transform on data/
+#   404.html               config/cloudflare/404.html: unknown paths get 404, not index.html
 #
 # The texts are not in git: they must be in data/ (tools/translations,
 # tools/commentaries) and pass their tests, or nothing is built.
@@ -37,6 +38,7 @@ cp build/html-bible.html "$OUT/"
 cp data/catalog.json "$OUT/data/"
 cp -R data/translations data/commentaries "$OUT/data/"
 cp config/cloudflare/_headers "$OUT/_headers"
+cp config/cloudflare/404.html "$OUT/404.html"
 
 echo
 echo "  $OUT: $(find "$OUT" -type f | wc -l | tr -d ' ') files, $(du -sh "$OUT" | cut -f1)"

@@ -7,7 +7,7 @@
         "method": "PATCH",
         "path": "/v1/me",
         "headers": {
-          "Authorization": "Bearer <jwt:elena>"
+          "Authorization": "Bearer <token:elena>"
         },
         "body": {
           "displayName": "Elena K."
@@ -17,9 +17,14 @@
         "status": 200,
         "body": {
           "id": "5cbfc5b0-9bd2-5637-bfe0-7d28368f5ace",
-          "provider": "apple",
+          "number": 4,
+          "login": "elena",
           "displayName": "Elena K.",
-          "createdAt": "2026-09-29T10:00:00.000Z"
+          "createdAt": "2026-09-29T10:00:00.000Z",
+          "invitedBy": {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "displayName": "root"
+          }
         }
       }
     }
