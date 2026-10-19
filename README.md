@@ -117,6 +117,11 @@ build_scripts/aws.sh                   # the API: Lambda, DynamoDB, api.bible.ma
 The demo goes to GitHub Pages from CI (`.github/workflows/test.yml`, job `demo`) after
 every green push to `main`.
 
+A version tag (`v0.2.0`, equal to `package.json`'s version) makes a GitHub release
+(`.github/workflows/release.yml`) with `html-bible-v0.2.0.html`: the page in one file to
+download and open from disk, built with `config/build.json`. The server is not published
+from GitHub; it goes to AWS only with `build_scripts/aws.sh`.
+
 ## Data
 
 The texts are built locally and published with the site; git keeps only

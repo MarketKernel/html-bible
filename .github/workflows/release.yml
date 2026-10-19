@@ -1,4 +1,9 @@
 name: release
+# A version tag (v0.2.0) publishes html-bible.html as a release asset: the
+# whole reader in one file, to download and open from disk. It is built with
+# config/build.json, so translations come from the site and sign-in goes to
+# the API, as on the site. Only the page is built and checked here — the
+# server (Rust, AWS Lambda) is deployed by hand with build_scripts/aws.sh.
 on:
   push:
     tags: ['v*']
@@ -12,21 +17,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # The server (server/, Rust): the runner has rustup; the build is cached.
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: server
       - run: npm ci
       - name: The tag matches package.json
         run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
-      - run: npm run check
+      - run: npm run typecheck && npm test
+      - run: npm run build
         env:
           RELEASE_TAG: ${{ github.ref_name }}
+      # Without the server: the page's own checks, discussions are skipped.
+      - run: npm run test:browser
+        env:
+          BIBLE_NO_SERVER: '1'
+      - name: No external references in the page
+        run: "! grep -E '<script[^>]+src=|<link[^>]+href=\"https?:' build/html-bible.html"
       - run: |
           cp build/html-bible.html "html-bible-$GITHUB_REF_NAME.html"
           sha256sum html-bible-*.html > SHA256SUMS.txt
       - uses: softprops/action-gh-release@v2
         with:
+          body: |
+            `html-bible-${{ github.ref_name }}.html` is the whole reader in one file: download it and open it from disk.
+            Translations are downloaded from https://bible.marketkernel.com/ the first time and then work offline.
           files: |
             html-bible-*.html
             SHA256SUMS.txt

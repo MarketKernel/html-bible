@@ -45,11 +45,14 @@ const API_PORT = await free();
 let api = null;
 // Its own store in a temporary folder: the developer's server/.data/ stays as it is.
 const store = await mkdtemp(join(tmpdir(), 'bible-store-'));
-let binary = join(root, 'server', 'target', 'debug', 'local');
-try {
-  execFileSync('cargo', ['build', '--quiet', '--bin', 'local'], { cwd: join(root, 'server'), stdio: ['ignore', 'ignore', 'inherit'] });
-} catch {
-  binary = existsSync(binary) ? binary : null;
+// BIBLE_NO_SERVER=1 (the release job) leaves Rust out: only the page is checked.
+let binary = process.env.BIBLE_NO_SERVER === '1' ? null : join(root, 'server', 'target', 'debug', 'local');
+if (binary) {
+  try {
+    execFileSync('cargo', ['build', '--quiet', '--bin', 'local'], { cwd: join(root, 'server'), stdio: ['ignore', 'ignore', 'inherit'] });
+  } catch {
+    binary = existsSync(binary) ? binary : null;
+  }
 }
 if (binary) {
   api = spawn(binary, ['--port', String(API_PORT), '--reset', '--data-dir', store, '--quiet'], { cwd: root, stdio: ['ignore', 'ignore', 'pipe'] });
