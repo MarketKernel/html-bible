@@ -109,17 +109,18 @@ try {
   /* ---- first run ---- */
   await navigate(BASE);
   await until(`!!document.querySelector('.onboarding .pack input')`);
+  // Gone after a reload: the first worker taking the page over must not reload it.
+  await evaluate(`window.firstRun = true`);
   check('first run lists the catalog', (await texts('.onboarding .pack .name')).length >= 2, true);
   await shot('onboarding');
   await evaluate(`document.querySelectorAll('.onboarding .pack input').forEach((b) => { if (!b.checked) b.click(); })`);
-  // Under load the first click can land before the page settles: press again if the step did not change.
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    await click('.onboarding .button.primary');
-    if (await until(`document.querySelector('.onboarding h1')?.textContent.includes('commentar')`, 4000).catch(() => false)) break;
-  }
+  await click('.onboarding .button.primary');
+  await until(`document.querySelector('.onboarding h1')?.textContent.includes('commentar')`);
   await click('.onboarding .button.primary');
   await until(`!!document.querySelector('.chapter .verse')`, 60000);
   check('reader opens after the downloads', await text('.reader-title'), 'Genesis 1');
+  await until(`!!navigator.serviceWorker?.controller`, 15000);
+  check('the first worker does not reload the page', await evaluate(`window.firstRun === true`), true);
 
   /* ---- links ---- */
   await go('#Synodal_Psa22-2-4');

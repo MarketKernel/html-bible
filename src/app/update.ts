@@ -19,9 +19,14 @@ export function initUpdates(): void {
     button.addEventListener('click', () => worker.postMessage('activate'));
     $('#toasts').appendChild(note);
   };
+  // The first worker claims the page too (clients.claim), which fires
+  // controllerchange; reloading then would throw away a first run half done
+  // (the translations chosen, downloads under way). Only a worker replacing
+  // another one is an update.
+  const hadController = !!navigator.serviceWorker.controller;
   let reloading = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (reloading) return;
+    if (reloading || !hadController) return;
     reloading = true;
     location.reload();
   });
