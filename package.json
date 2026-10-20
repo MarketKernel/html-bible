@@ -1,6 +1,6 @@
 {
   "name": "html-bible",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "private": true,
   "description": "A Bible reader in one HTML file: search, readable verse links, translations, commentaries and discussions",
   "license": "MIT",
