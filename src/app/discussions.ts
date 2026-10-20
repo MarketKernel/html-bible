@@ -18,7 +18,7 @@
 
 import { type Argument, type ArgumentVerse, type Interpretation, localized, type LocalizedText, type Outcome, type Question, type QuestionFull, type Tallies, type Tally, type VerseTag, type VoteValue } from '../core/api-types';
 import { bookInfo, type BookId } from '../core/books';
-import { type CanonVerse, compareKeys, keyOf, parseKey, rangeToNative, refToRanges, verseText } from '../core/canon';
+import { type CanonVerse, compareKeys, keyOf, parseKey, rangeToNative, refToRanges, textAttrs, verseText } from '../core/canon';
 import { CONFIG } from '../core/config';
 import { discussionFile, discussionFileName } from '../core/discussion-file';
 import { t, tn } from '../core/i18n';
@@ -455,7 +455,7 @@ function verseCard(q: Question, verse: ArgumentVerse, interpretations: Interpret
     ),
     // The full text first; votes and the interpretations come under it.
     natives.length
-      ? h('p', { class: 'stone-text' }, natives.map((loc) => [natives.length > 1 ? h('sup', null, String(loc.verse)) : null, `${(verseText(tr!, loc) ?? '').replace(/[[\]]/g, '')} `]))
+      ? h('p', { class: 'stone-text', ...textAttrs(tr!) }, natives.map((loc) => [natives.length > 1 ? h('sup', null, String(loc.verse)) : null, `${(verseText(tr!, loc) ?? '').replace(/[[\]]/g, '')} `]))
       : h('p', { class: 'stone-text missing' }, t('discussions', 'The verse text is not in the translation being read.')),
     h(
       'div',

@@ -11,6 +11,7 @@
 use serde::Serialize;
 
 use crate::model::{Argument, Question, RefRange, Text};
+use crate::originals::Original;
 
 /// What is being saved: it decides what "belongs here" means.
 pub enum Subject<'a> {
@@ -73,14 +74,13 @@ pub struct EvalArgument {
     pub summary_md: Option<Text>,
 }
 
-/// `text` / `context` (KJV, ±3 verses) once the server has the text; the stub needs neither.
+/// `original`: the verse in Hebrew or Greek with ±3 verses, when the server has the texts; the stub needs none.
 #[derive(Serialize)]
 pub struct EvalVerse {
     pub id: String,
     #[serde(rename = "ref")]
     pub range: RefRange,
-    pub text: Option<String>,
-    pub context: Option<String>,
+    pub original: Option<Original>,
 }
 
 #[derive(Serialize)]

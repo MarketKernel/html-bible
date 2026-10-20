@@ -182,7 +182,7 @@ button { cursor: pointer; }
 }
 .chapter.parallel { max-width: 1100px; }
 .verse {
-  position: relative; margin: 0; padding: 2px 8px 2px 2.4em; border-radius: var(--radius-small);
+  position: relative; margin: 0; padding-block: 2px; padding-inline: 2.4em 8px; border-radius: var(--radius-small);
   scroll-margin-top: calc(var(--topbar) + 60px);
 }
 .verse .vnum {
@@ -191,6 +191,9 @@ button { cursor: pointer; }
 }
 .verse.highlight { background: var(--highlight); }
 .verse.selected { background: var(--selected); box-shadow: inset 3px 0 0 var(--selected-line); }
+.verse[dir='rtl'].selected { box-shadow: inset -3px 0 0 var(--selected-line); }
+/* Hebrew with vowels and accents: fonts that have the marks (installed ones only), a size that keeps them legible. */
+[lang='hbo'] { font-family: 'SBL Hebrew', 'Ezra SIL', 'Taamey Frank CLM', 'Times New Roman', 'Arial Hebrew', serif; font-size: 1.12em; }
 .verse.noncanonical .vtext { color: var(--text-soft); }
 .verse .added { font-style: italic; color: var(--text-soft); }
 .markers { display: inline-flex; gap: 4px; margin-inline-start: 6px; vertical-align: 0.1em; }

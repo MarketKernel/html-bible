@@ -89,6 +89,7 @@ check('md: plain text', C.plainText(md('**Bold** and [link](https://e.x)\n- item
 
 /* ---------------- search ---------------- */
 check('normalize', C.normalize('Ёлка, «Свет»! It’s'), 'елка свет its');
+check('normalize: Greek accents and final sigma', C.normalize('ὁ θεὸς τὸν κόσμον'), 'ο θεοσ τον κοσμον');
 check('query', C.parseQuery('Бог "в начале" -тьма люб*'), { words: ['бог', 'люб'], phrases: ['в начале'], not: ['тьма'] });
 const translation = {
   id: 't', books: [

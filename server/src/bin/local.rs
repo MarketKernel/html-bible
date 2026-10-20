@@ -209,6 +209,14 @@ fn main() {
         app.reviewer = Box::new(html_bible_server::openai::OpenAi::new(&key, &review, &eval));
         app.evaluator = Box::new(html_bible_server::openai::OpenAi::new(&key, &review, &eval));
     }
+    // The verse in Hebrew or Greek for the evaluator: the site's own texts, when built.
+    let originals = std::env::var("BIBLE_ORIGINALS_DIR").unwrap_or_else(|_| "data/translations".into());
+    if std::path::Path::new(&originals).join("grc-rp2018.json.gz").exists() {
+        let texts = html_bible_server::originals::Originals::new(&originals);
+        app.verse_text = Some(Box::new(move |range| texts.text(range)));
+    } else {
+        println!("no original-language texts in {originals}: the evaluator gets the reference only");
+    }
     let app = Arc::new(app);
     let fresh = o.reset || !seed::seeded(&app).unwrap_or(false);
     if fresh {

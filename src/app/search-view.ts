@@ -9,7 +9,7 @@
  */
 
 import { bookInfo, type AnyBookId } from '../core/books';
-import { isNoncanonical, verseText } from '../core/canon';
+import { isNoncanonical, textAttrs, verseText } from '../core/canon';
 import { t, tn } from '../core/i18n';
 import { formatHuman, parseRef } from '../core/refs';
 import { formatRoute, parseRoute } from '../core/route';
@@ -92,7 +92,7 @@ function hitElement(v: View, i: number): HTMLElement {
   return h(
     'div',
     { class: 'hit', role: 'option', 'aria-selected': String(i === v.selected), dataset: { i: String(i) }, tabindex: -1, on: { click: (event) => !(event.target as HTMLElement).closest('a, button') && select(i, 'click') } },
-    h('div', { class: 'hit-text' }, marked(clean(verseText(tr, loc) ?? ''), query)),
+    h('div', { class: 'hit-text', ...textAttrs(tr) }, marked(clean(verseText(tr, loc) ?? ''), query)),
     h(
       'div',
       { class: 'hit-foot' },
@@ -154,6 +154,7 @@ function renderPreview(v: View, loc: VerseLoc): void {
             'p',
             {
               class: ['verse', hitIndex !== undefined && 'hit-verse', isNoncanonical(v.tr, { book: loc.book, chapter: loc.chapter, verse }) && 'noncanonical'],
+              ...textAttrs(v.tr),
               dataset: { v: String(verse), ...(hitIndex !== undefined ? { i: String(hitIndex) } : {}) },
               on: hitIndex !== undefined ? { click: () => select(hitIndex, 'click') } : undefined,
             },

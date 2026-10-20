@@ -9,6 +9,8 @@
 # cross-compiles with zig: `pip install cargo-lambda` brings both.
 # The zip goes to the bucket html-bible-deploy-<account>, made here the first time;
 # so is the key of invitation codes (SSM /html-bible/invite-key), which is never replaced.
+# The evaluator shows the model each verse in Hebrew or Greek: those four texts
+# from data/translations/ go into the zip (node tools/translations/build.mjs wlc rp pt tr).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -24,6 +26,15 @@ fi
 
 (cd server && cargo lambda build --release --arm64 --bin lambda --no-default-features --features aws --output-format zip)
 ZIP=server/target/lambda/lambda/bootstrap.zip
+ORIGINALS=(hbo-wlc grc-rp2018 grc-pt1904 grc-tr)
+for id in "${ORIGINALS[@]}"; do
+  if [ ! -f "data/translations/$id.json.gz" ]; then
+    echo "data/translations/$id.json.gz is missing: node tools/translations/build.mjs wlc rp pt tr" >&2
+    exit 1
+  fi
+done
+# At translations/ in the zip: $LAMBDA_TASK_ROOT/translations, where the Lambda reads them.
+(cd data && for id in "${ORIGINALS[@]}"; do zip -q "../$ZIP" "translations/$id.json.gz"; done)
 
 ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
 BUCKET="html-bible-deploy-$ACCOUNT"

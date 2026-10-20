@@ -18,6 +18,8 @@ net = ["dep:ureq"]
 
 [dependencies]
 base64 = "0.22"
+# The original-language texts (data/translations/*.json.gz) for the evaluator; pure Rust.
+flate2 = "1"
 getrandom = "0.2"
 hmac = "0.12"
 serde = { version = "1", features = ["derive"] }

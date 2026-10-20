@@ -6,7 +6,7 @@
  */
 
 import { type BookId, isCanonicalBook } from '../core/books';
-import { canonicalVerseCount, fromKey, verseText } from '../core/canon';
+import { canonicalVerseCount, fromKey, textAttrs, verseText } from '../core/canon';
 import { t } from '../core/i18n';
 import { formatHuman, type ParsedRef } from '../core/refs';
 import { formatRoute } from '../core/route';
@@ -74,7 +74,7 @@ export async function openCompare(container: HTMLElement, ref: ParsedRef): Promi
             : null,
           h('button', { type: 'button', class: 'icon-button', title: t('compare', 'Hide this translation here'), 'aria-label': t('compare', 'Hide this translation here'), on: { click: () => { updateSettings({ compareHidden: [...settings.compareHidden, tr.id] }); void openCompare(container, ref); } } }, icon('close')),
         ),
-        lines.map((l) => (l.loc ? h('p', null, h('sup', null, keys.length > 1 || differs ? `${l.loc.chapter}:${l.loc.verse}` : ''), l.text) : h('p', { class: 'missing' }, t('compare', 'Not in this translation ({ref}).', { ref: `${l.key.chapter}:${l.key.verse}` })))),
+        lines.map((l) => (l.loc ? h('p', textAttrs(tr), h('sup', null, keys.length > 1 || differs ? `${l.loc.chapter}:${l.loc.verse}` : ''), l.text) : h('p', { class: 'missing' }, t('compare', 'Not in this translation ({ref}).', { ref: `${l.key.chapter}:${l.key.verse}` })))),
       ),
     );
     void (tr satisfies Translation);

@@ -592,8 +592,13 @@ every configured model. Tallies are computed on read, so they are always current
 - **Model input** (`server/src/llm.rs`): the topic, the subtopic, both
   positions, the verse, and the interpretations of both sides. Votes are
   never included. The positions are shuffled and labelled `A` and `B`;
-  which side is A depends on the content. There is a hook for the KJV text
-  with ±3 verses of context (`App.verse_text`), and the stub works without it.
+  which side is A depends on the content. The verse also goes in its original
+  language only, never in a translation (`server/src/originals.rs`, `App.verse_text`):
+  Hebrew (WLC) for the Old Testament, Greek for the New (RP 2018, plus PT 1904 and
+  TR wherever they word it otherwise), with ±3 verses around it, from the server's
+  own copy of `data/translations/`. The prompt asks the model to read the text
+  itself, not traditions or familiar translations. Without the files the model
+  gets the reference only; the stub needs neither.
   Models answer `A | B | none` with a confidence and a rationale that may say
   `[A]` / `[B]`. The server maps the answer back to `1 / -1 / 0` and puts the
   position labels into the rationale, so the client gets plain text.

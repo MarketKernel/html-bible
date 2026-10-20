@@ -20,7 +20,7 @@ const OTHERS = [
   ['uk-ogienko', 0, 'Так бо Бог полюбив світ'],
 ];
 
-needData('translations', 'translations/en-kjv.json.gz', 'translations/ru-synodal.json.gz', ...OTHERS.map(([id]) => `translations/${id}.json.gz`));
+needData('translations', 'translations/en-kjv.json.gz', 'translations/ru-synodal.json.gz', 'translations/grc-rp2018.json.gz', 'translations/grc-pt1904.json.gz', 'translations/grc-tr.json.gz', 'translations/hbo-wlc.json.gz', ...OTHERS.map(([id]) => `translations/${id}.json.gz`));
 const { check, done } = checker();
 const { versification } = await load('core/versification/map');
 const { KJV_COUNTS } = await load('core/versification/kjv-counts');
@@ -171,7 +171,9 @@ for (const [id, emptyVerses, john] of OTHERS) {
   check(`${id}: empty verses`, t.books.reduce((n, b) => n + b.chapters.reduce((m, c) => m + c.filter((s) => !s).length, 0), 0), emptyVerses);
   check(`${id}: John 3:16`, verse(t, 'JHN', 3, 16).startsWith(john), true);
 }
-const linkNames = [kjv, syn, ...Object.values(others)].map((t) => t.linkName.toLowerCase());
+const greek = Object.fromEntries(['grc-rp2018', 'grc-pt1904', 'grc-tr'].map((id) => [id, read(`${id}.json.gz`)]));
+const wlc = read('hbo-wlc.json.gz');
+const linkNames = [kjv, syn, wlc, ...Object.values(greek), ...Object.values(others)].map((t) => t.linkName.toLowerCase());
 check('link names differ', new Set(linkNames).size, linkNames.length);
 check('WEB: the doxology of Romans moved to 16:25–27', [others['en-web'].books.find((b) => b.id === 'ROM').chapters[13].length, verse(others['en-web'], 'ROM', 16, 25).startsWith('Now to him who is able')], [23, true]);
 check('Darby: no brackets around the doubtful John 5:3–4', /[[\]]/.test(verse(others['en-darby'], 'JHN', 5, 3) + verse(others['en-darby'], 'JHN', 5, 4)), false);
@@ -183,6 +185,45 @@ check('Ohienko: Ps 51:19 is the last verse', verse(og, 'PSA', 51, 19).length > 0
 check('Ohienko: 1 Sam 21:1 closes 20:42', verse(og, '1SA', 20, 42).endsWith('а Йонатан пішов до міста.'), true);
 check('Ohienko: 3 John 15 closes verse 14', [verse(og, '3JN', 1, 14).endsWith('Амінь.'), verse(og, '3JN', 1, 15)], [true, undefined]);
 check('Ohienko: Ukrainian book names', [book(og, 'GEN').name, book(og, 'JHN').short], ['Буття', 'Ів']);
+
+// The Greek New Testaments: the 27 books in the KJV's shape, nothing else.
+// [id, verses left empty, John 3:16]
+const NT = CANONICAL_BOOKS.slice(CANONICAL_BOOKS.indexOf('MAT'));
+const GREEK_EMPTY = { 'grc-rp2018': ['LUK 17:36', 'ACT 8:37', 'ACT 15:34', 'ACT 24:7'], 'grc-pt1904': ['MRK 7:16'], 'grc-tr': [] };
+for (const [id, empty] of Object.entries(GREEK_EMPTY)) {
+  const t = greek[id];
+  check(`${id}: validator`, validateTranslation(t), []);
+  check(`${id}: header`, [t.id, t.lang, t.versification, t.license], [id, 'grc', 'kjv', 'Public domain']);
+  check(`${id}: the New Testament in canonical order`, t.books.map((b) => b.id), NT);
+  check(`${id}: the KJV's shape`, Object.fromEntries(t.books.map((b) => [b.id, b.chapters.map((c) => c.length)])), Object.fromEntries(NT.map((b) => [b, KJV_COUNTS[b]])));
+  check(`${id}: empty verses`, t.books.flatMap((b) => b.chapters.flatMap((c, ci) => c.flatMap((s, vi) => (s ? [] : [`${b.id} ${ci + 1}:${vi + 1}`])))), empty);
+  check(`${id}: John 3:16`, /^Οὕτως? γὰρ ἠγάπησεν ὁ [θΘ]εὸς τὸν κόσμον/i.test(verse(t, 'JHN', 3, 16)), true);
+  check(`${id}: the doxology of Romans at 16:25–27`, [book(t, 'ROM').chapters[13].length, verse(t, 'ROM', 16, 25).startsWith('Τῷ δὲ δυναμένῳ')], [23, true]);
+  check(`${id}: no paragraph marks, hyphens or brackets`, t.books.some((b) => b.chapters.some((c) => c.some((s) => /[¶\-[\]⟦⟧]/.test(s)))), false);
+  check(`${id}: Greek book names`, [book(t, 'MAT').name, book(t, '1CO').short], ['Κατὰ Ματθαῖον', 'Α΄ Κορ']);
+}
+const pt = greek['grc-pt1904'];
+check(`PT: John 1:38–39 of the edition is the KJV's 1:38`, [verse(pt, 'JHN', 1, 38).includes('ποῦ μένεις'), verse(pt, 'JHN', 1, 39).startsWith('λέγει αὐτοῖς· ἔρχεσθε')], [true, true]);
+check(`PT: 2 Cor 13:12 of the edition divided at the KJV's 13:13`, [verse(pt, '2CO', 13, 12).endsWith('φιλήματι.'), verse(pt, '2CO', 13, 13)], [true, 'ἀσπάζονται ὑμᾶς οἱ ἅγιοι πάντες.']);
+check('PT: 3 John 15 closes verse 14', verse(pt, '3JN', 1, 14).endsWith('κατ᾽ ὄνομα.'), true);
+check('PT: Rev 15:9 closes verse 8', verse(pt, 'REV', 15, 8).endsWith('τῶν ἑπτὰ ἀγγέλων.'), true);
+check('TR: no subscription after Romans', verse(greek['grc-tr'], 'ROM', 16, 27).includes('ἐγράφη'), false);
+
+// The Hebrew Old Testament: the 39 books folded into the KJV's numbering.
+const OT = CANONICAL_BOOKS.slice(0, CANONICAL_BOOKS.indexOf('MAT'));
+// The source orders the marks of a letter its own way (never normalized: that breaks how they render), so compare normalized.
+const opens = (text, start) => text.normalize('NFC').startsWith(start.normalize('NFC'));
+check('WLC: validator', validateTranslation(wlc), []);
+check('WLC: header', [wlc.id, wlc.lang, wlc.versification, wlc.license], ['hbo-wlc', 'hbo', 'kjv', 'Public domain']);
+check('WLC: the Old Testament in canonical order', wlc.books.map((b) => b.id), OT);
+check(`WLC: the KJV's shape`, Object.fromEntries(wlc.books.map((b) => [b.id, b.chapters.map((c) => c.length)])), Object.fromEntries(OT.map((b) => [b, KJV_COUNTS[b]])));
+check('WLC: only Neh 7:68 empty (not in the Masoretic text)', wlc.books.flatMap((b) => b.chapters.flatMap((c, ci) => c.flatMap((s, vi) => (s ? [] : [`${b.id} ${ci + 1}:${vi + 1}`])))), ['NEH 7:68']);
+check('WLC: Genesis 1:1', opens(verse(wlc, 'GEN', 1, 1), 'בְּרֵאשִׁ֖ית בָּרָ֣א אֱלֹהִ֑ים'), true);
+check('WLC: the title of Ps 51 opens verse 1, Ps 51:19 is the last', [opens(verse(wlc, 'PSA', 51, 1), 'לַמְנַצֵּ֗חַ'), verse(wlc, 'PSA', 51, 19).length > 0, verse(wlc, 'PSA', 51, 20)], [true, true, undefined]);
+check('WLC: Malachi 3:19–24 of the Hebrew is the KJV\'s chapter 4', [book(wlc, 'MAL').chapters.length, book(wlc, 'MAL').chapters[3].length], [4, 6]);
+check('WLC: Isa 63:19b is the KJV\'s 64:1', opens(verse(wlc, 'ISA', 64, 1), 'לוּא־קָרַ֤עְתָּ'), true);
+check('WLC: Num 25:19 opens the KJV\'s 26:1', opens(verse(wlc, 'NUM', 26, 1), 'וַיְהִ֖י אַחֲרֵ֣י הַמַּגֵּפָ֑ה'), true);
+check('WLC: Hebrew book names', [book(wlc, 'GEN').name, book(wlc, 'PSA').short], ['בראשית', 'תה׳']);
 
 // A new reader is offered the first translation of their language.
 const catalog = JSON.parse(readFileSync(join(root, 'data', 'catalog.json'), 'utf8'));

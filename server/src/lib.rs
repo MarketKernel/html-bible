@@ -16,6 +16,7 @@ pub mod llm;
 pub mod model;
 #[cfg(feature = "net")]
 pub mod openai;
+pub mod originals;
 pub mod pipeline;
 pub mod ratings;
 pub mod refs;

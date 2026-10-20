@@ -21,7 +21,11 @@ const CONVERTERS = {
   darby: ['build-ebible.mjs', 'darby'],
   web: ['build-ebible.mjs', 'web'],
   ylt: ['build-ebible.mjs', 'ylt'],
+  pt: ['build-ebible.mjs', 'pt'],
+  tr: ['build-ebible.mjs', 'tr'],
   ogienko: ['build-ogienko.mjs'],
+  rp: ['build-byztxt.mjs'],
+  wlc: ['build-hebrew.mjs'],
 };
 const wanted = process.argv.slice(2);
 const names = wanted.length ? wanted : Object.keys(CONVERTERS);

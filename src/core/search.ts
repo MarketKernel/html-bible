@@ -16,11 +16,12 @@
 import { type AnyBookId, bookInfo } from './books';
 import type { Translation, VerseLoc } from './types';
 
-/** Lower case, ё → е, no diacritics or apostrophes, punctuation → space. */
+/** Lower case, ё → е, final ς → σ, no diacritics or apostrophes, punctuation → space. */
 export function normalize(text: string): string {
   return text
     .toLowerCase()
     .replace(/ё/g, 'е')
+    .replace(/ς/g, 'σ')
     .normalize('NFD')
     .replace(/\p{M}/gu, '')
     .replace(/['’ʼ`]/g, '')

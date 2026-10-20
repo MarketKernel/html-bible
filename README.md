@@ -132,9 +132,18 @@ The texts are built locally and published with the site; git keeps only
   format in `Task.md` §5.1:
   - English: KJV, ASV, BSB, Darby, WEB, YLT (eBible.org USFM);
   - Russian: the Synodal (CrossWire RusSynodal, 77 books);
-  - Ukrainian: Ohienko (bolls.life; CrossWire's copy merges verses).
+  - Ukrainian: Ohienko (bolls.life; CrossWire's copy merges verses);
+  - Greek, New Testament only: Robinson–Pierpont 2018, the Byzantine Textform
+    (the editors' accented CSV on GitHub; eBible.org's copy has no accents),
+    the Patriarchal text of 1904 and the Textus Receptus (eBible.org USFM);
+  - Hebrew, Old Testament only: the Masoretic text (Westminster Leningrad Codex,
+    eBible.org `hbo`), its numbering folded into the KJV's by Paratext's `eng.vrs`;
+    shown right to left.
+  The Hebrew and the Greek also go to the discussions' AI evaluator, which sees a
+  verse only in its original language (`server/src/originals.rs`).
   All but the Synodal are in KJV numbering: where an edition numbers otherwise
-  (WEB's Romans doxology, Ohienko's Psalm titles), the converter folds it in.
+  (the Romans doxology of WEB, RP and PT, Ohienko's Psalm titles, the Patriarchal
+  text's own verse divisions), the converter folds it in.
 - `data/commentaries/` — commentary sets split per book (Lopukhin,
   `tools/commentaries/lopukhin.py`).
 - `data/catalog.json` — generated (`tools/translations/build-catalog.mjs`), with sizes

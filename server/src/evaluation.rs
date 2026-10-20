@@ -165,8 +165,7 @@ pub fn evaluation_input(
         verse: EvalVerse {
             id: verse.id.clone(),
             range: verse.range.clone(),
-            text: text.as_ref().map(|t| t.0.clone()),
-            context: text.map(|t| t.1),
+            original: text,
         },
         interpretations: EvalSides { A: column("A"), B: column("B") },
     }

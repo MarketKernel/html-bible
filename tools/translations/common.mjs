@@ -46,5 +46,19 @@ export function counts(translation) {
 export const dataDir = join(root, 'data');
 export const sourcesDir = join(root, 'private', 'sources');
 
+/** id → [name, short] of the New Testament in Greek: the titles Greek editions print, shortened as they cite them. */
+export const GREEK_NAMES = {
+  MAT: ['Κατὰ Ματθαῖον', 'Ματθ'], MRK: ['Κατὰ Μᾶρκον', 'Μάρκ'], LUK: ['Κατὰ Λουκᾶν', 'Λουκ'], JHN: ['Κατὰ Ἰωάννην', 'Ἰω'],
+  ACT: ['Πράξεις τῶν Ἀποστόλων', 'Πράξ'], ROM: ['Πρὸς Ῥωμαίους', 'Ῥωμ'],
+  '1CO': ['Πρὸς Κορινθίους Α΄', 'Α΄ Κορ'], '2CO': ['Πρὸς Κορινθίους Β΄', 'Β΄ Κορ'],
+  GAL: ['Πρὸς Γαλάτας', 'Γαλ'], EPH: ['Πρὸς Ἐφεσίους', 'Ἐφ'], PHP: ['Πρὸς Φιλιππησίους', 'Φιλιπ'], COL: ['Πρὸς Κολοσσαεῖς', 'Κολ'],
+  '1TH': ['Πρὸς Θεσσαλονικεῖς Α΄', 'Α΄ Θεσ'], '2TH': ['Πρὸς Θεσσαλονικεῖς Β΄', 'Β΄ Θεσ'],
+  '1TI': ['Πρὸς Τιμόθεον Α΄', 'Α΄ Τιμ'], '2TI': ['Πρὸς Τιμόθεον Β΄', 'Β΄ Τιμ'],
+  TIT: ['Πρὸς Τίτον', 'Τίτ'], PHM: ['Πρὸς Φιλήμονα', 'Φιλήμ'], HEB: ['Πρὸς Ἑβραίους', 'Ἑβρ'], JAS: ['Ἰακώβου', 'Ἰακ'],
+  '1PE': ['Πέτρου Α΄', 'Α΄ Πέτ'], '2PE': ['Πέτρου Β΄', 'Β΄ Πέτ'],
+  '1JN': ['Ἰωάννου Α΄', 'Α΄ Ἰω'], '2JN': ['Ἰωάννου Β΄', 'Β΄ Ἰω'], '3JN': ['Ἰωάννου Γ΄', 'Γ΄ Ἰω'],
+  JUD: ['Ἰούδα', 'Ἰούδ'], REV: ['Ἀποκάλυψις Ἰωάννου', 'Ἀποκ'],
+};
+
 /** First characters of a text, for reports that must stay short. */
 export const clip = (text, n = 120) => (text.length > n ? `${text.slice(0, n)}…` : text);

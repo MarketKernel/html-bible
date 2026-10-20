@@ -74,6 +74,14 @@ export function isNoncanonical(translation: Translation, loc: VerseLoc): boolean
   return versification(translation.versification).isNoncanonical(loc);
 }
 
+/** Languages written right to left (the Hebrew Old Testament). */
+const RTL = new Set(['hbo', 'he', 'arc']);
+
+/** lang and dir for an element holding a translation's text: Hebrew runs right to left, and lang picks fitting fonts. */
+export function textAttrs(translation: Translation): { lang: string; dir?: 'rtl' } {
+  return RTL.has(translation.lang) ? { lang: translation.lang, dir: 'rtl' } : { lang: translation.lang };
+}
+
 /** A native verse's canonical key; null for noncanonical. */
 export function toKey(translation: Translation, loc: VerseLoc): CanonVerse | null {
   if (isNoncanonical(translation, loc)) return null;

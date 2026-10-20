@@ -186,9 +186,12 @@ start. The models are stack parameters: `ReviewModel` (gpt-5.4-mini) and
   it and answers 202 at once). The evaluator — the same binary — asks the
   stronger model about the verse: the whole topic (title, summary, both
   positions shuffled as A and B), the subtopic, and every interpretation of
-  both columns in its author's own language. The verse goes by reference only
-  (KJV numbering): its text is never sent, so no one can slip in a changed
-  one — the model relies on its own knowledge of the Bible. It stores the verdict and the verse is `fresh` again, usually within seconds.
+  both columns in its author's own language. The verse goes by reference (KJV
+  numbering) and in its original language only — Hebrew (WLC) or Greek (RP 2018,
+  with PT 1904 and TR where they differ), ±3 verses around it — from the copies of
+  `data/translations/` that `aws.sh` puts in the zip, never from a member, so no one
+  can slip in a changed text. No translation is sent: the prompt asks the model to
+  read the original itself, not traditions or familiar translations. It stores the verdict and the verse is `fresh` again, usually within seconds.
   A failed run is tried once more; meanwhile the verse keeps its last verdicts.
   Verdicts are cached by input hash and model: an unchanged input is never
   sent twice. A topic's and a subtopic's AI score is the tally of their verses.

@@ -9,7 +9,7 @@
  */
 
 import { type AnyBookId, bookInfo, type BookId, isCanonicalBook } from '../core/books';
-import { canonicalRefToNative, fromKey, isNoncanonical, keyOf, refToRanges, toKey, verseCount, verseText } from '../core/canon';
+import { canonicalRefToNative, fromKey, isNoncanonical, keyOf, refToRanges, textAttrs, toKey, verseCount, verseText } from '../core/canon';
 import { t } from '../core/i18n';
 import { formatHuman, formatLink, type ParsedRef, partsFromVerses, versesInChapter } from '../core/refs';
 import { formatRoute } from '../core/route';
@@ -173,6 +173,7 @@ function verseElement(tr: Translation, loc: VerseLoc, text: string, own: boolean
     'p',
     {
       class: ['verse', noncanonical && 'noncanonical', own && state?.highlight.has(loc.verse) && 'highlight', own && state?.selected.has(loc.verse) && 'selected'],
+      ...textAttrs(tr),
       dataset: own ? { v: String(loc.verse) } : { pv: `${loc.chapter}.${loc.verse}` },
       id: own ? `v${loc.verse}` : undefined,
     },
@@ -476,7 +477,8 @@ function pickBook(): void {
     ];
     clear(
       body,
-      groups.map(([name, books]) => [
+      // A New Testament alone (the Greek) has no Old Testament to title.
+      groups.filter(([, books]) => books.length).map(([name, books]) => [
         h('div', { class: 'group-title' }, name),
         h(
           'div',
