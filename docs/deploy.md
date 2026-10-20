@@ -40,13 +40,21 @@ any stack, tagged `project=html-bible`):
 5–70 ms, 18 MB used), its log group (14 days), the HTTP API with its
 `$default` route and the mapping onto `api.bible.marketkernel.com`. The code
 zips go to the bucket `html-bible-deploy-224410707956` (deleted after 30
-days; Lambda keeps its own copy). The account allows 10 concurrent Lambda
-runs in all, so none can be reserved for this one: the stage's throttling
-(10 requests per second, burst 20) is the cap.
+days; Lambda keeps its own copy). The account allows 1000 concurrent Lambda
+runs in eu-central-1 (raised from a new account's 10 on 2026-10-19). None is
+reserved for these functions yet, so the stage's throttling (10 requests per
+second, burst 20) is the cap.
 
 ```sh
 build_scripts/aws.sh     # cargo-lambda (pip install cargo-lambda), the AWS CLI profile html-bible
 ```
+
+After the stack, `aws.sh` runs the `originals` binary on this computer: it
+fills `html-bible-originals` (31,102 verses: WLC and SBLGNT from
+`data/translations/`, about a minute) with the profile's credentials, skips it
+when the table holds these very files already (their sha256 is in `meta`),
+then gives the verses added before it their text and sends them to the
+evaluator again.
 
 ## Cost: about nothing for ~100 users
 
@@ -75,8 +83,9 @@ Guards against a surprise bill:
 
 - **AWS Budgets**: a $1 monthly budget with an e-mail alert (two budgets are free).
 - **API Gateway stage throttling**: for example 10 requests per second, burst 20.
-- **Lambda concurrency**: the account's limit is 10 in all (new accounts);
-  with a raised limit, reserve 5 for the API and 1–2 for the evaluator.
+- **Lambda concurrency**: the account's limit is 1000 (raised from 10);
+  reserving 5 for the API and 1–2 for the evaluator would cap both, and keep
+  a burst of evaluations from crowding out the API.
 - **DynamoDB**: on-demand with a maximum throughput on each table.
 - **OpenAI**: the project's monthly limit; evaluations are debounced and
   cached by input hash already (`verdicts`).
@@ -187,11 +196,11 @@ start. The models are stack parameters: `ReviewModel` (gpt-5.4-mini) and
   stronger model about the verse: the whole topic (title, summary, both
   positions shuffled as A and B), the subtopic, and every interpretation of
   both columns in its author's own language. The verse goes by reference (KJV
-  numbering) and in its original language only — Hebrew (WLC) or Greek (RP 2018,
-  with PT 1904 and TR where they differ), ±3 verses around it — from the copies of
-  `data/translations/` that `aws.sh` puts in the zip, never from a member, so no one
-  can slip in a changed text. No translation is sent: the prompt asks the model to
-  read the original itself, not traditions or familiar translations. It stores the verdict and the verse is `fresh` again, usually within seconds.
+  numbering) and in its original language only — Hebrew (WLC) or Greek (SBLGNT),
+  ±3 verses around it — copied into the verse when it was added from the table
+  `html-bible-originals`, never from a member, so no one can slip in a changed
+  text. No translation is sent: the prompt asks the model to judge by the original
+  alone, not traditions or familiar translations. It stores the verdict and the verse is `fresh` again, usually within seconds.
   A failed run is tried once more; meanwhile the verse keeps its last verdicts.
   Verdicts are cached by input hash and model: an unchanged input is never
   sent twice. A topic's and a subtopic's AI score is the tally of their verses.

@@ -120,6 +120,19 @@ export interface Argument {
   tally: Tallies;
 }
 
+/**
+ * A stone's text in its original language, from the server's own table (WLC for
+ * the Old Testament, SBLGNT for the New): what the AI judges by. One verse as is;
+ * several, each line after its "chapter:verse". Empty: the edition has not got the verse.
+ */
+export interface VerseOriginal {
+  lang: 'hbo' | 'grc';
+  edition: string;
+  text: string;
+  /** A long range: only its start. */
+  cut?: boolean;
+}
+
 /** A "stone": a verse or a range in a subtopic, shared by both sides. */
 export interface ArgumentVerse {
   id: string;
@@ -131,6 +144,8 @@ export interface ArgumentVerse {
   votes: VerseVotes;
   users: { outcome: Outcome };
   ai: { outcome: Outcome; status: 'fresh' | 'pending' | 'none'; verdicts: VerseVerdict[] };
+  /** None while the server's table had not got it. */
+  original?: VerseOriginal;
 }
 
 export interface Interpretation {

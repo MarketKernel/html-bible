@@ -73,7 +73,7 @@ impl<'a> View<'a> {
     pub fn verse(&self, verse: &Verse) -> StoreResult<Value> {
         let votes = self.app.db().query::<Vote>("targetKey", &format!("verse:{}", verse.id))?;
         let values: Vec<i64> = votes.iter().map(|v| v.value).collect();
-        Ok(json!({
+        let mut out = json!({
             "id": verse.id,
             "argumentId": verse.argument_id,
             "questionId": verse.question_id,
@@ -87,7 +87,16 @@ impl<'a> View<'a> {
                 "status": verse.ai.status,
                 "verdicts": verse.ai.verdicts,
             },
-        }))
+        });
+        // What readers see beside their translation; the context is the evaluator's only.
+        if let Some(original) = &verse.original {
+            let mut shown = json!({ "lang": original.lang, "edition": original.edition, "text": original.text });
+            if original.cut {
+                shown["cut"] = json!(true);
+            }
+            out["original"] = shown;
+        }
+        Ok(out)
     }
 
     pub fn verses_of(&self, field: &str, value: &str) -> StoreResult<Vec<Verse>> {

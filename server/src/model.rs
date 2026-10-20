@@ -214,6 +214,26 @@ pub struct VerseAi {
     pub input_hash: Option<String>,
 }
 
+/// A verse of a discussion in its original language, copied from `originals`
+/// when it is added (originals.rs): what the evaluator reads, and what readers
+/// see beside their translation. Never anything a member sent.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Original {
+    /// "hbo" (Biblical Hebrew) or "grc" (Koine Greek).
+    pub lang: String,
+    /// "WLC" or "SBLGNT".
+    pub edition: String,
+    /// One verse as it is; several, each after its "chapter:verse"; empty: the edition has not got the verse.
+    pub text: String,
+    /// The three verses before and after, one "chapter:verse text" per line (for the evaluator).
+    pub before: String,
+    pub after: String,
+    /// The range is longer than originals::MAX_VERSES: `text` has its start only.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub cut: bool,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Verse {
@@ -225,8 +245,33 @@ pub struct Verse {
     pub author_id: String,
     pub created_at: String,
     pub ai: VerseAi,
+    /// None: the originals table was empty when the verse was added (filled in later, originals::backfill).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub original: Option<Original>,
 }
 record!(Verse, "verses");
+
+/// One verse of the original-language Bible, keyed as the discussions are
+/// ("JHN.3.16", KJV numbering): the Hebrew Old Testament (WLC), the Greek New (SBLGNT).
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct OriginalVerse {
+    pub id: String,
+    pub lang: String,
+    pub edition: String,
+    /// Empty: the edition has not got the verse (Matt 17:21 in the SBLGNT).
+    pub text: String,
+}
+record!(OriginalVerse, "originals");
+
+/// What `originals` was filled from: the sha256 of the source files, so an
+/// unchanged text is not written again ("originals" in `meta`).
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct OriginalsSource {
+    pub id: String,
+    pub sha256: String,
+    pub verses: u64,
+}
+record!(OriginalsSource, "meta");
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -280,7 +325,7 @@ pub struct Meta {
 }
 record!(Meta, "meta");
 
-pub const TABLES: [&str; 13] = [
+pub const TABLES: [&str; 14] = [
     "users", "logins", "numbers", "invites", "sessions", "throttle", "questions", "arguments", "verses", "interpretations", "votes",
-    "verdicts", "meta",
+    "verdicts", "meta", "originals",
 ];

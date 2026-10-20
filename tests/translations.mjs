@@ -20,7 +20,7 @@ const OTHERS = [
   ['uk-ogienko', 0, 'Так бо Бог полюбив світ'],
 ];
 
-needData('translations', 'translations/en-kjv.json.gz', 'translations/ru-synodal.json.gz', 'translations/grc-rp2018.json.gz', 'translations/grc-pt1904.json.gz', 'translations/grc-tr.json.gz', 'translations/hbo-wlc.json.gz', ...OTHERS.map(([id]) => `translations/${id}.json.gz`));
+needData('translations', 'translations/en-kjv.json.gz', 'translations/ru-synodal.json.gz', 'translations/grc-rp2018.json.gz', 'translations/grc-pt1904.json.gz', 'translations/grc-tr.json.gz', 'translations/grc-sblgnt.json.gz', 'translations/hbo-wlc.json.gz', ...OTHERS.map(([id]) => `translations/${id}.json.gz`));
 const { check, done } = checker();
 const { versification } = await load('core/versification/map');
 const { KJV_COUNTS } = await load('core/versification/kjv-counts');
@@ -172,8 +172,9 @@ for (const [id, emptyVerses, john] of OTHERS) {
   check(`${id}: John 3:16`, verse(t, 'JHN', 3, 16).startsWith(john), true);
 }
 const greek = Object.fromEntries(['grc-rp2018', 'grc-pt1904', 'grc-tr'].map((id) => [id, read(`${id}.json.gz`)]));
+const sbl = read('grc-sblgnt.json.gz');
 const wlc = read('hbo-wlc.json.gz');
-const linkNames = [kjv, syn, wlc, ...Object.values(greek), ...Object.values(others)].map((t) => t.linkName.toLowerCase());
+const linkNames = [kjv, syn, wlc, sbl, ...Object.values(greek), ...Object.values(others)].map((t) => t.linkName.toLowerCase());
 check('link names differ', new Set(linkNames).size, linkNames.length);
 check('WEB: the doxology of Romans moved to 16:25–27', [others['en-web'].books.find((b) => b.id === 'ROM').chapters[13].length, verse(others['en-web'], 'ROM', 16, 25).startsWith('Now to him who is able')], [23, true]);
 check('Darby: no brackets around the doubtful John 5:3–4', /[[\]]/.test(verse(others['en-darby'], 'JHN', 5, 3) + verse(others['en-darby'], 'JHN', 5, 4)), false);
@@ -208,6 +209,21 @@ check(`PT: 2 Cor 13:12 of the edition divided at the KJV's 13:13`, [verse(pt, '2
 check('PT: 3 John 15 closes verse 14', verse(pt, '3JN', 1, 14).endsWith('κατ᾽ ὄνομα.'), true);
 check('PT: Rev 15:9 closes verse 8', verse(pt, 'REV', 15, 8).endsWith('τῶν ἑπτὰ ἀγγέλων.'), true);
 check('TR: no subscription after Romans', verse(greek['grc-tr'], 'ROM', 16, 27).includes('ἐγράφη'), false);
+
+// The SBLGNT, the critical text the evaluator reads: the verses the oldest witnesses lack stay empty.
+const SBL_EMPTY = ['MAT 17:21', 'MAT 18:11', 'MAT 23:14', 'MRK 7:16', 'MRK 9:44', 'MRK 9:46', 'MRK 11:26', 'MRK 15:28', 'LUK 17:36', 'LUK 23:17', 'JHN 5:4', 'ACT 8:37', 'ACT 15:34', 'ACT 24:7', 'ACT 28:29', 'ROM 16:25', 'ROM 16:26', 'ROM 16:27'];
+check('SBLGNT: validator', validateTranslation(sbl), []);
+check('SBLGNT: header', [sbl.id, sbl.lang, sbl.versification, sbl.license], ['grc-sblgnt', 'grc', 'kjv', 'CC BY 4.0']);
+check('SBLGNT: the New Testament in canonical order', sbl.books.map((b) => b.id), NT);
+check(`SBLGNT: the KJV's shape`, Object.fromEntries(sbl.books.map((b) => [b.id, b.chapters.map((c) => c.length)])), Object.fromEntries(NT.map((b) => [b, KJV_COUNTS[b]])));
+check('SBLGNT: empty verses', sbl.books.flatMap((b) => b.chapters.flatMap((c, ci) => c.flatMap((s, vi) => (s ? [] : [`${b.id} ${ci + 1}:${vi + 1}`])))), SBL_EMPTY);
+check('SBLGNT: John 1:1', verse(sbl, 'JHN', 1, 1), 'Ἐν ἀρχῇ ἦν ὁ λόγος, καὶ ὁ λόγος ἦν πρὸς τὸν θεόν, καὶ θεὸς ἦν ὁ λόγος.');
+check('SBLGNT: no apparatus signs', sbl.books.some((b) => b.chapters.some((c) => c.some((s) => /[⸀-⸅]/.test(s)))), false);
+check('SBLGNT: ⟦ ⟧ around the passages judged later', [verse(sbl, 'MRK', 16, 9).startsWith('⟦'), verse(sbl, 'JHN', 7, 53).startsWith('⟦')], [true, true]);
+check(`SBLGNT: Acts 19:40b is the KJV's 19:41`, verse(sbl, 'ACT', 19, 41), 'καὶ ταῦτα εἰπὼν ἀπέλυσεν τὴν ἐκκλησίαν.');
+check(`SBLGNT: 2 Cor 13:12 divided at the KJV's 13:13`, [verse(sbl, '2CO', 13, 13), verse(sbl, '2CO', 13, 14).startsWith('ἡ χάρις')], ['ἀσπάζονται ὑμᾶς οἱ ἅγιοι πάντες.', true]);
+check('SBLGNT: 3 John 15 closes verse 14, Rev 12:18 opens 13:1', [verse(sbl, '3JN', 1, 14).endsWith('κατʼ ὄνομα.'), verse(sbl, 'REV', 13, 1).startsWith('καὶ ἐστάθη ἐπὶ τὴν ἄμμον')], [true, true]);
+check('SBLGNT: Greek book names', [book(sbl, 'MAT').name, book(sbl, '1CO').short], ['Κατὰ Ματθαῖον', 'Α΄ Κορ']);
 
 // The Hebrew Old Testament: the 39 books folded into the KJV's numbering.
 const OT = CANONICAL_BOOKS.slice(0, CANONICAL_BOOKS.indexOf('MAT'));

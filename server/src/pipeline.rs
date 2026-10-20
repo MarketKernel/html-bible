@@ -16,6 +16,7 @@ use crate::errors::{deleted, forbidden, item_deleted, not_found, validation, val
 use crate::evaluation;
 use crate::llm::{Review, Subject};
 use crate::model::{Argument, Interpretation, Question, Record, Sides, Text, User, Verse, VerseAi, Vote};
+use crate::originals;
 use crate::refs;
 use crate::text::{clean_line, clean_md, clean_tags, require_lang, LANGS, NAME_MAX, SIDE_MAX, TITLE_MAX};
 use crate::views::View;
@@ -287,6 +288,8 @@ pub fn create_verse(app: &App, user: &User, argument_id: &str, body: &Value) -> 
     if let Some(existing) = app.db().query::<Verse>("argumentId", argument_id)?.into_iter().find(|v| v.range == range) {
         return Err(ApiError::new(409, "duplicate_verse", "This verse is already in the subtopic").field("ref").extra("id", json!(existing.id)));
     }
+    // From the server's own table, never from the request.
+    let original = originals::lookup(&app.db(), &range)?;
     let verse = Verse {
         id: app.new_id(),
         argument_id: argument_id.to_string(),
@@ -295,6 +298,7 @@ pub fn create_verse(app: &App, user: &User, argument_id: &str, body: &Value) -> 
         author_id: user.id.clone(),
         created_at: app.now_iso(),
         ai: VerseAi { status: "none".into(), verdicts: Vec::new(), input_hash: None },
+        original,
     };
     app.db().put(&verse)?;
     evaluation::request(app, &verse.id)?;

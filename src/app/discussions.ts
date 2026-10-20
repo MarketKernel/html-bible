@@ -16,7 +16,7 @@
  * the discussions with the verse's result and leads to it.
  */
 
-import { type Argument, type ArgumentVerse, type Interpretation, localized, type LocalizedText, type Outcome, type Question, type QuestionFull, type Tallies, type Tally, type VerseTag, type VoteValue } from '../core/api-types';
+import { type Argument, type ArgumentVerse, type Interpretation, localized, type LocalizedText, type Outcome, type Question, type QuestionFull, type Tallies, type Tally, type VerseOriginal, type VerseTag, type VoteValue } from '../core/api-types';
 import { bookInfo, type BookId } from '../core/books';
 import { type CanonVerse, compareKeys, keyOf, parseKey, rangeToNative, refToRanges, textAttrs, verseText } from '../core/canon';
 import { CONFIG } from '../core/config';
@@ -392,6 +392,27 @@ function argumentBlock(q: Question, argument: Argument, verses: ArgumentVerse[],
   return block;
 }
 
+const EDITIONS: Record<string, string> = { WLC: 'Westminster Leningrad Codex', SBLGNT: 'SBL Greek New Testament' };
+
+/** The stone in Hebrew or Greek, as the AI reads it; several verses get their numbers. */
+function originalText(original: VerseOriginal): HTMLElement {
+  const lines = original.text.includes('\n') ? original.text.split('\n').map((line) => /^(\d+):(\d+) ?(.*)$/.exec(line)) : null;
+  const empty = lines ? lines.every((m) => !m?.[3]) : !original.text.trim();
+  return h(
+    'div',
+    { class: 'stone-original' },
+    h('span', { class: 'stone-label', title: t('discussions', 'The AI judges the verse by this text only, not by translations or traditions.') }, t('discussions', 'Original'), ' · ', h('abbr', { title: EDITIONS[original.edition] }, original.edition)),
+    empty
+      ? h('p', { class: 'stone-text missing' }, t('discussions', 'This edition has not got the verse: the oldest manuscripts lack it.'))
+      : h(
+          'p',
+          { class: 'stone-text', lang: original.lang, dir: original.lang === 'hbo' ? 'rtl' : undefined },
+          lines ? lines.map((m) => (m ? [h('sup', null, m[2]), `${m[3]} `] : null)) : original.text,
+          original.cut ? ' …' : null,
+        ),
+  );
+}
+
 function verseCard(q: Question, verse: ArgumentVerse, interpretations: Interpretation[], focused: boolean, reload: () => void): HTMLElement {
   const me = currentUser()?.id;
   const tr = readerTranslation();
@@ -453,10 +474,16 @@ function verseCard(q: Question, verse: ArgumentVerse, interpretations: Interpret
         ? h('span', { class: 'outcome open' }, h('span', { class: 'pending' }, t('discussions', 'AI…')))
         : h('span', { class: ['outcome', outcomeClass(verse.ai?.outcome)], title: t('discussions', 'The AI’s result') }, `${t('discussions', 'AI')}: ${outcomeLabel(verse.ai?.outcome, q.sides)}`),
     ),
-    // The full text first; votes and the interpretations come under it.
-    natives.length
-      ? h('p', { class: 'stone-text', ...textAttrs(tr!) }, natives.map((loc) => [natives.length > 1 ? h('sup', null, String(loc.verse)) : null, `${(verseText(tr!, loc) ?? '').replace(/[[\]]/g, '')} `]))
-      : h('p', { class: 'stone-text missing' }, t('discussions', 'The verse text is not in the translation being read.')),
+    // The full text first, the original and the translation being read; votes and the interpretations come under it.
+    verse.original ? originalText(verse.original) : null,
+    h(
+      'div',
+      { class: 'stone-translation' },
+      verse.original && tr ? h('span', { class: 'stone-label' }, t('discussions', 'Translation'), ' · ', tr.shortName) : null,
+      natives.length
+        ? h('p', { class: 'stone-text', ...textAttrs(tr!) }, natives.map((loc) => [natives.length > 1 ? h('sup', null, String(loc.verse)) : null, `${(verseText(tr!, loc) ?? '').replace(/[[\]]/g, '')} `]))
+        : h('p', { class: 'stone-text missing' }, t('discussions', 'The verse text is not in the translation being read.')),
+    ),
     h(
       'div',
       { class: 'stone-vote', role: 'group', 'aria-label': t('discussions', 'What does this verse teach?') },

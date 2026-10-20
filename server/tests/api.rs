@@ -11,8 +11,11 @@ use html_bible_server::http::Request;
 use html_bible_server::invites;
 use html_bible_server::ids::parse_iso;
 use html_bible_server::llm::{Draft, EvalInput, Evaluator, StubEvaluator};
+use html_bible_server::model::{Original, OriginalVerse};
+use html_bible_server::originals;
 use html_bible_server::seed;
 use html_bible_server::store::MemoryStore;
+use std::sync::Mutex;
 use serde_json::{json, Value};
 
 const NOW: &str = "2026-10-18T12:00:00.000Z";
@@ -138,6 +141,51 @@ fn verdicts_are_cached_by_input() {
     let id = created["id"].as_str().unwrap();
     call(&app, "DELETE", &format!("/v1/interpretations/{id}"), Some(&anna), None);
     assert_eq!(asked.load(Ordering::SeqCst), 2, "back to the seed's input: from the cache");
+}
+
+/// The stub, keeping the originals it was shown.
+struct Recording(Arc<Mutex<Vec<Option<Original>>>>);
+
+impl Evaluator for Recording {
+    fn models(&self) -> Vec<String> {
+        StubEvaluator.models()
+    }
+    fn evaluate(&self, model: &str, input: &EvalInput) -> Result<Draft, String> {
+        self.0.lock().unwrap().push(input.verse.original.clone());
+        StubEvaluator.evaluate(model, input)
+    }
+}
+
+#[test]
+fn a_verse_carries_its_original_from_the_servers_table() {
+    let mut app = app();
+    let shown = Arc::new(Mutex::new(Vec::new()));
+    app.evaluator = Box::new(Recording(Arc::clone(&shown)));
+    let db = app.db();
+    for v in 1..=8 {
+        let text = format!("λόγος {v}");
+        db.put(&OriginalVerse { id: format!("JHN.1.{v}"), lang: "grc".into(), edition: "SBLGNT".into(), text }).unwrap();
+    }
+    // The seed's John 1:1 was added before the table was filled: its text comes now.
+    assert!(app.db().get::<html_bible_server::model::Verse>(VERSE).unwrap().unwrap().original.is_none());
+    assert_eq!(originals::backfill(&app).unwrap(), vec![VERSE.to_string()]);
+    let (_, full, _) = call(&app, "GET", "/v1/questions/01JAS000000000000000000Q01", None, None);
+    let seeded = full["verses"].as_array().unwrap().iter().find(|v| v["id"] == VERSE).unwrap().clone();
+    assert_eq!(seeded["original"], json!({ "lang": "grc", "edition": "SBLGNT", "text": "λόγος 1" }));
+
+    // A new stone: the text is the table's, whatever the request says.
+    let anna = token(&app, "anna");
+    let body = json!({ "ref": { "from": "JHN.1.4", "to": "JHN.1.5" }, "original": { "lang": "grc", "text": "forged" } });
+    let (status, created, _) = call(&app, "POST", "/v1/arguments/01JAS000000000000000000A01/verses", Some(&anna), Some(body));
+    assert_eq!(status, 201, "{created}");
+    assert_eq!(created["original"], json!({ "lang": "grc", "edition": "SBLGNT", "text": "1:4 λόγος 4\n1:5 λόγος 5" }));
+    let seen = shown.lock().unwrap().last().cloned().flatten().expect("the evaluator was shown the original");
+    assert_eq!((seen.text.as_str(), seen.before.as_str(), seen.after.as_str()), ("1:4 λόγος 4\n1:5 λόγος 5", "1:1 λόγος 1\n1:2 λόγος 2\n1:3 λόγος 3", "1:6 λόγος 6\n1:7 λόγος 7\n1:8 λόγος 8"));
+    assert!(!serde_json::to_string(&*shown.lock().unwrap()).unwrap().contains("forged"));
+
+    // Without the table a verse simply has none.
+    let (_, other, _) = call(&app, "POST", "/v1/arguments/01JAS000000000000000000A01/verses", Some(&anna), Some(json!({ "ref": { "from": "ROM.9.5", "to": "ROM.9.5" } })));
+    assert!(other.get("original").is_none());
 }
 
 /* ------------------------------------------------------------ sign-in */

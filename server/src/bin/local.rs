@@ -15,6 +15,8 @@ use std::time::Duration;
 
 use html_bible_server::app::{App, Config};
 use html_bible_server::http::{apply_cors, preflight, Request, Response};
+use html_bible_server::evaluation;
+use html_bible_server::originals::{self, Loaded};
 use html_bible_server::router::owns;
 use html_bible_server::seed;
 use html_bible_server::store::MemoryStore;
@@ -209,20 +211,31 @@ fn main() {
         app.reviewer = Box::new(html_bible_server::openai::OpenAi::new(&key, &review, &eval));
         app.evaluator = Box::new(html_bible_server::openai::OpenAi::new(&key, &review, &eval));
     }
-    // The verse in Hebrew or Greek for the evaluator: the site's own texts, when built.
-    let originals = std::env::var("BIBLE_ORIGINALS_DIR").unwrap_or_else(|_| "data/translations".into());
-    if std::path::Path::new(&originals).join("grc-rp2018.json.gz").exists() {
-        let texts = html_bible_server::originals::Originals::new(&originals);
-        app.verse_text = Some(Box::new(move |range| texts.text(range)));
-    } else {
-        println!("no original-language texts in {originals}: the evaluator gets the reference only");
-    }
     let app = Arc::new(app);
     let fresh = o.reset || !seed::seeded(&app).unwrap_or(false);
     if fresh {
-        app.store.clear().and_then(|_| seed::load(&app)).unwrap_or_else(|e| panic!("seeding {}: {}", o.data_dir.display(), e.0));
+        app.store.clear().unwrap_or_else(|e| panic!("clearing {}: {}", o.data_dir.display(), e.0));
+    }
+    // The Hebrew and Greek texts first, so the demo's verses get theirs.
+    let translations = o.data_root.join("translations");
+    match originals::load(app.store.as_ref(), &translations) {
+        Ok(Loaded::Written(n)) => println!("originals: {n} verses from {}", translations.display()),
+        Ok(Loaded::Unchanged) => {}
+        Ok(Loaded::Missing(file)) => println!("originals: no {file}, so verses have no original text (node tools/translations/build.mjs wlc sblgnt)"),
+        Err(e) => panic!("originals: {}", e.0),
+    }
+    if fresh {
+        seed::load(&app).unwrap_or_else(|e| panic!("seeding {}: {}", o.data_dir.display(), e.0));
         println!("seeded {} with the demo topic (root/rootroot; anna, david, elena, mikhail, sarah with <login>-demo)", o.data_dir.display());
     }
+    // Verses added before the table was filled: their text now, then a new evaluation.
+    for verse_id in originals::backfill(&app).unwrap_or_else(|e| panic!("originals: {}", e.0)) {
+        println!("originals: {verse_id} got its text, evaluating again");
+        if let Err(e) = evaluation::request(&app, &verse_id) {
+            eprintln!("[evaluation] {verse_id}: {}", e.0);
+        }
+    }
+    let _ = app.store.flush();
     if app.config.eval_delay_ms > 0 {
         let app = Arc::clone(&app);
         std::thread::spawn(move || loop {

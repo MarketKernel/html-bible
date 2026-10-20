@@ -26,6 +26,7 @@ use serde_json::{json, Map, Value};
 use crate::app::App;
 use crate::ids::sha256_hex;
 use crate::llm::{Answer, EvalArgument, EvalInput, EvalInterpretation, EvalPositions, EvalQuestion, EvalSides, EvalVerse};
+use crate::originals;
 use crate::model::{Argument, CachedVerdict, Interpretation, Question, Text, Verdict, Verse, VerseAi};
 use crate::store::StoreResult;
 
@@ -68,7 +69,8 @@ pub fn live_interpretations(app: &App, verse_id: &str) -> StoreResult<Vec<Interp
 
 /// sha256 (hex) of the canonical JSON of the verse and its live interpretations:
 /// keys sorted, no whitespace, UTF-8, interpretations ordered by id —
-/// {"interpretations":[{"bodyMd","id","replyTo"?,"side"}],"verse":{"id","ref"}}.
+/// {"interpretations":[{"bodyMd","id","replyTo"?,"side"}],"verse":{"id","original"?,"ref"}},
+/// `original` being the verse's text in its original language once it has one.
 pub fn input_hash(verse: &Verse, interpretations: &[Interpretation]) -> String {
     let mut sorted: Vec<&Interpretation> = interpretations.iter().collect();
     sorted.sort_by(|a, b| a.id.cmp(&b.id));
@@ -85,7 +87,11 @@ pub fn input_hash(verse: &Verse, interpretations: &[Interpretation]) -> String {
             Value::Object(entry)
         })
         .collect();
-    let data = json!({ "verse": { "id": verse.id, "ref": verse.range }, "interpretations": items });
+    let mut about = json!({ "id": verse.id, "ref": verse.range });
+    if let Some(original) = &verse.original {
+        about["original"] = json!(original.text);
+    }
+    let data = json!({ "verse": about, "interpretations": items });
     sha256_hex(canonical_json(&data).as_bytes())
 }
 
@@ -131,14 +137,12 @@ fn other(side: &str) -> &'static str {
 }
 
 pub fn evaluation_input(
-    app: &App,
     question: Option<&Question>,
     argument: Option<&Argument>,
     verse: &Verse,
     interpretations: &[Interpretation],
     a_side: &str,
 ) -> EvalInput {
-    let text = app.verse_text.as_ref().and_then(|f| f(&verse.range));
     let side_of = |label: &str| if label == "A" { a_side } else { other(a_side) };
     let column = |label: &str| {
         interpretations
@@ -165,7 +169,7 @@ pub fn evaluation_input(
         verse: EvalVerse {
             id: verse.id.clone(),
             range: verse.range.clone(),
-            original: text,
+            original: verse.original.clone(),
         },
         interpretations: EvalSides { A: column("A"), B: column("B") },
     }
@@ -222,13 +226,20 @@ pub fn run(app: &App, verse_id: &str, at: Option<&str>) -> StoreResult<()> {
         return Ok(());
     };
     app.evaluation_runs.fetch_add(1, Ordering::SeqCst);
+    // A verse added while the table was empty gets its original now.
+    if verse.original.is_none() {
+        if let Some(original) = originals::lookup(&db, &verse.range)? {
+            verse.original = Some(original);
+            db.put(&verse)?;
+        }
+    }
     let interpretations = live_interpretations(app, verse_id)?;
     let previous = verse.ai.verdicts.clone();
     let digest = input_hash(&verse, &interpretations);
     let a_side = side_of_a(&verse, &interpretations);
     let question = db.get::<Question>(&verse.question_id)?;
     let argument = db.get::<Argument>(&verse.argument_id)?;
-    let input = evaluation_input(app, question.as_ref(), argument.as_ref(), &verse, &interpretations, a_side);
+    let input = evaluation_input(question.as_ref(), argument.as_ref(), &verse, &interpretations, a_side);
     let value_of = |answer: Answer| match answer {
         Answer::A => {
             if a_side == "pro" {

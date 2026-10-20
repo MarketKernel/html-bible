@@ -22,7 +22,6 @@ use base64::Engine;
 use html_bible_server::app::{App, Config};
 use html_bible_server::dynamo::{Aws, Credentials, DynamoStore};
 use html_bible_server::openai::OpenAi;
-use html_bible_server::originals::Originals;
 use html_bible_server::http::{Request, Response};
 use html_bible_server::invites;
 use serde_json::{json, Map, Value};
@@ -56,10 +55,6 @@ fn build_app() -> Result<App, String> {
         app.reviewer = Box::new(OpenAi::new(&key, &review, &eval));
         app.evaluator = Box::new(OpenAi::new(&key, &review, &eval));
     }
-    // The verse in Hebrew or Greek for the evaluator: the texts aws.sh puts in the zip, read on first use.
-    let originals = env("BIBLE_ORIGINALS_DIR").unwrap_or_else(|| format!("{}/translations", env("LAMBDA_TASK_ROOT").unwrap_or_else(|| ".".into())));
-    let texts = Originals::new(originals);
-    app.verse_text = Some(Box::new(move |range| texts.text(range)));
     if let Some(function) = env("BIBLE_EVALUATOR_FUNCTION") {
         let aws = Aws::new(&region, credentials);
         app.defer = Some(Box::new(move |verse_id: &str| aws.invoke_async(&function, &json!({ "evaluate": verse_id }))));

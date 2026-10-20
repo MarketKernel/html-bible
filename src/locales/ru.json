@@ -189,7 +189,11 @@
     "No points yet": "Пока нет оценок",
     "Save as JSON": "Сохранить в JSON",
     "The topic with its subtopics, verses, ratings and interpretations, in both languages": "Тема с подтемами, стихами, оценками и толкованиями, на обоих языках",
-    "added by": "добавил(а)"
+    "added by": "добавил(а)",
+    "The AI judges the verse by this text only, not by translations or traditions.": "ИИ судит о стихе только по этому тексту, а не по переводам и традициям.",
+    "Original": "Оригинал",
+    "This edition has not got the verse: the oldest manuscripts lack it.": "В этом издании стиха нет: его нет в древнейших рукописях.",
+    "Translation": "Перевод"
   },
   "editor": {
     "Link": "Ссылка",

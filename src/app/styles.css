@@ -409,6 +409,9 @@ time { white-space: nowrap; }
 .stone-text { margin: 10px 0 12px; padding: 10px 14px; border-radius: var(--radius-small); background: var(--bg-raised); font-family: var(--font-text); font-size: 17.5px; line-height: 1.6; }
 .stone-text.missing { font-family: var(--font-ui); font-size: 14px; color: var(--text-faint); font-style: italic; }
 .stone-text sup { font: 600 11px var(--font-ui); color: var(--text-faint); margin-inline-end: 3px; }
+.stone-original .stone-text, .stone-translation .stone-text { margin-top: 2px; }
+.stone-label { display: block; margin-top: 10px; font: 600 11px var(--font-ui); letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint); }
+.stone-label abbr { text-decoration: none; cursor: help; }
 .stone-vote { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .vote-button { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line-strong); background: var(--bg-raised); border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 13px; }
 .vote-button .count { min-width: 22px; text-align: center; border-radius: 999px; background: var(--bg-sunken); padding: 0 6px; font-weight: 600; }

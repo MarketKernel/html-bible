@@ -133,6 +133,13 @@ interface ArgumentVerse {            // a "stone"
   votes: { pro: number; con: number; none: number; mine?: 1 | -1 | 0 | null };   // mine: only with a token
   users: { outcome: Outcome };
   ai: { outcome: Outcome; status: 'fresh' | 'pending' | 'none'; verdicts: VerseVerdict[] };
+  original?: VerseOriginal;          // absent while the server's originals table had not got the verse
+}
+interface VerseOriginal {            // the stone in its original language, what the AI judges by
+  lang: 'hbo' | 'grc';
+  edition: 'WLC' | 'SBLGNT';
+  text: string;                      // one verse as is; several: "chapter:verse text" per line; "": not in the edition
+  cut?: true;                        // a range over 100 verses: only its start
 }
 interface VerseVerdict {
   verseId: string;
@@ -357,6 +364,10 @@ Fixtures: `argument-create.json`, `argument-patch.json`.
 response already has `ai.status: "fresh"`; a verse without interpretations
 gets value `0`, confidence 0.3, from both models. With a delay it is
 `"pending"`, with `outcome: null` and `verdicts: []`.
+
+The server copies the verse's text in its original language from its own
+table into it (`original`); anything else in the body, an `original` too, is
+ignored. Show it with the reader's translation: the AI sees nothing else.
 
 - The same `{from, to}` twice in one subtopic → `409 duplicate_verse`, and
   the error carries the existing verse's id:
@@ -587,18 +598,23 @@ every configured model. Tallies are computed on read, so they are always current
   cost one evaluation. In production the window will be about 30 s.
 - **Cache**: verdicts are cached under `inputHash + model`. `inputHash` is
   the sha256 (hex) of the canonical JSON (sorted keys, no whitespace, UTF-8)
-  of `{ verse: { id, ref }, interpretations: [{ id, side, bodyMd, replyTo? }] }`
-  over the live interpretations sorted by id.
+  of `{ verse: { id, ref, original? }, interpretations: [{ id, side, bodyMd, replyTo? }] }`
+  over the live interpretations sorted by id; `original` is the verse's
+  `original.text` once it has one.
 - **Model input** (`server/src/llm.rs`): the topic, the subtopic, both
   positions, the verse, and the interpretations of both sides. Votes are
   never included. The positions are shuffled and labelled `A` and `B`;
   which side is A depends on the content. The verse also goes in its original
-  language only, never in a translation (`server/src/originals.rs`, `App.verse_text`):
-  Hebrew (WLC) for the Old Testament, Greek for the New (RP 2018, plus PT 1904 and
-  TR wherever they word it otherwise), with ±3 verses around it, from the server's
-  own copy of `data/translations/`. The prompt asks the model to read the text
-  itself, not traditions or familiar translations. Without the files the model
-  gets the reference only; the stub needs neither.
+  language only, never in a translation (`server/src/originals.rs`): Hebrew
+  (Westminster Leningrad Codex) for the Old Testament, Greek (SBL Greek New
+  Testament, the critical text of the oldest manuscripts) for the New, with ±3
+  verses around it. It is copied into the verse, when the verse is added, from
+  the server's table `originals` (one item per verse, KJV keys, filled from
+  `data/translations/hbo-wlc` and `grc-sblgnt`), never from a member. The prompt
+  asks the model to judge by that text alone, setting aside traditions,
+  commentaries and familiar translations. A verse added while the table was
+  empty gets its text at its next evaluation (or `originals::backfill`); until
+  then the model gets the reference only. The stub needs neither.
   Models answer `A | B | none` with a confidence and a rationale that may say
   `[A]` / `[B]`. The server maps the answer back to `1 / -1 / 0` and puts the
   position labels into the rationale, so the client gets plain text.

@@ -10,7 +10,7 @@
  *   node tools/translations/build-catalog.mjs DIR    the same for another folder (the test data)
  *
  * Run after any converter (build-kjv.mjs, build-synodal.mjs, build-ebible.mjs,
- * build-ogienko.mjs, build-byztxt.mjs, build-hebrew.mjs,
+ * build-ogienko.mjs, build-byztxt.mjs, build-sblgnt.mjs, build-hebrew.mjs,
  * tools/commentaries/lopukhin.py) has rewritten a file.
  */
 import { createHash } from 'node:crypto';

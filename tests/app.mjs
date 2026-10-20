@@ -257,6 +257,11 @@ try {
     await send('Page.reload');
     await until(`!!document.querySelector('.stone')`, 15000);
     check('verse text shown when the topic is opened directly', await evaluate(`[...document.querySelectorAll('.stone .stone-text')].every((p) => !p.classList.contains('missing') && p.textContent.trim().length > 10)`), true);
+    // With data/ here the server fills its table of originals: each stone shows the Greek or the Hebrew above the translation.
+    if (existsSync(join(root, 'data', 'translations', 'grc-sblgnt.json.gz'))) {
+      const originals = `[...document.querySelectorAll('.stone')].map((s) => { const p = s.querySelector('.stone-original .stone-text'); return [p?.lang, p?.dir, !!s.querySelector('.stone-translation .stone-text')] })`;
+      check('each stone shows its original and the translation', (await evaluate(originals)).every(([lang, dir, translated]) => (lang === 'grc' || (lang === 'hbo' && dir === 'rtl')) && translated), true);
+    }
     await evaluate(`document.querySelectorAll('.argument').forEach((a) => (a.open = true))`);
     await until(`!!document.querySelector('.stone')`);
     // Verses stand in the order of the books of the Bible, in every subtopic.

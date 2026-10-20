@@ -18,7 +18,7 @@ net = ["dep:ureq"]
 
 [dependencies]
 base64 = "0.22"
-# The original-language texts (data/translations/*.json.gz) for the evaluator; pure Rust.
+# Reads the original-language texts (data/translations/*.json.gz) into the originals table; pure Rust.
 flate2 = "1"
 getrandom = "0.2"
 hmac = "0.12"
@@ -42,3 +42,8 @@ required-features = ["aws"]
 lto = true
 codegen-units = 1
 strip = true
+
+[[bin]]
+name = "originals"
+path = "src/bin/originals.rs"
+required-features = ["aws"]

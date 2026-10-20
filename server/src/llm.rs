@@ -10,8 +10,7 @@
 
 use serde::Serialize;
 
-use crate::model::{Argument, Question, RefRange, Text};
-use crate::originals::Original;
+use crate::model::{Argument, Original, Question, RefRange, Text};
 
 /// What is being saved: it decides what "belongs here" means.
 pub enum Subject<'a> {
@@ -74,7 +73,7 @@ pub struct EvalArgument {
     pub summary_md: Option<Text>,
 }
 
-/// `original`: the verse in Hebrew or Greek with ±3 verses, when the server has the texts; the stub needs none.
+/// `original`: the verse in Hebrew or Greek with ±3 verses, from the server's table; the stub needs none.
 #[derive(Serialize)]
 pub struct EvalVerse {
     pub id: String,

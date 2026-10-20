@@ -227,6 +227,19 @@ Resources:
       AttributeDefinitions: [{ AttributeName: id, AttributeType: S }]
       KeySchema: [{ AttributeName: id, KeyType: HASH }]
 
+  # The Bible in Hebrew (WLC) and Greek (SBLGNT), one item per verse, keyed
+  # "JHN.3.16" (KJV numbering): filled by the originals binary (aws.sh), read
+  # when a verse is added to a discussion (server/src/originals.rs).
+  OriginalsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}originals'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: id, AttributeType: S }]
+      KeySchema: [{ AttributeName: id, KeyType: HASH }]
+
   # ------------------------------------------------------------ the Lambda
 
   ApiLogs:

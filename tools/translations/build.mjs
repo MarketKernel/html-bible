@@ -25,6 +25,7 @@ const CONVERTERS = {
   tr: ['build-ebible.mjs', 'tr'],
   ogienko: ['build-ogienko.mjs'],
   rp: ['build-byztxt.mjs'],
+  sblgnt: ['build-sblgnt.mjs'],
   wlc: ['build-hebrew.mjs'],
 };
 const wanted = process.argv.slice(2);

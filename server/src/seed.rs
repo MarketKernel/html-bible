@@ -130,6 +130,7 @@ pub fn load(app: &App) -> StoreResult<()> {
             id,
             argument_id: text(&verse, "argumentId"),
             question_id: question_of(&text(&verse, "argumentId")),
+            original: crate::originals::lookup(&db, &range)?,
             range,
             author_id: users(&verse["author"]),
             created_at: text(&verse, "createdAt"),

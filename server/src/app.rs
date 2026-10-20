@@ -10,8 +10,6 @@ use crate::evaluation::Scheduler;
 use crate::http::{Request, Response};
 use crate::ids::{iso, random_bytes, system_now_ms, ulid};
 use crate::llm::{Evaluator, Reviewer, StubEvaluator, StubReviewer};
-use crate::model::RefRange;
-use crate::originals::Original;
 use crate::store::{Db, Store};
 
 /// Attempts allowed per window before `429 too_many_requests`.
@@ -83,9 +81,6 @@ pub enum Clock {
 /// Sends "evaluate this verse" away; an error leaves the verse pending until its next change.
 pub type Defer = Box<dyn Fn(&str) -> Result<(), String> + Send + Sync>;
 
-/// A range in its original language and ±3 verses around it, for the evaluator (originals.rs).
-pub type VerseText = Box<dyn Fn(&RefRange) -> Option<Original> + Send + Sync>;
-
 pub struct App {
     pub config: Config,
     pub store: Box<dyn Store>,
@@ -93,8 +88,6 @@ pub struct App {
     /// Checks and translates what is saved, in the request (llm.rs).
     pub reviewer: Box<dyn Reviewer>,
     pub evaluator: Box<dyn Evaluator>,
-    /// None without the texts (tests, a server without data/); the stub evaluator needs none.
-    pub verse_text: Option<VerseText>,
     pub scheduler: Scheduler,
     /// Hands an evaluation to someone else, after the response (in AWS: an
     /// asynchronous call of the evaluator Lambda). None: in the request, or by
@@ -116,7 +109,6 @@ impl App {
             clock: Clock::System,
             reviewer: Box::new(StubReviewer),
             evaluator: Box::new(StubEvaluator),
-            verse_text: None,
             scheduler: Scheduler::default(),
             defer: None,
             evaluation_runs: AtomicUsize::new(0),

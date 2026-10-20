@@ -133,14 +133,18 @@ The texts are built locally and published with the site; git keeps only
   - English: KJV, ASV, BSB, Darby, WEB, YLT (eBible.org USFM);
   - Russian: the Synodal (CrossWire RusSynodal, 77 books);
   - Ukrainian: Ohienko (bolls.life; CrossWire's copy merges verses);
-  - Greek, New Testament only: Robinson–Pierpont 2018, the Byzantine Textform
-    (the editors' accented CSV on GitHub; eBible.org's copy has no accents),
-    the Patriarchal text of 1904 and the Textus Receptus (eBible.org USFM);
+  - Greek, New Testament only: the SBL Greek New Testament (a critical text of
+    the oldest manuscripts, CC BY 4.0, the editors' repository on GitHub),
+    Robinson–Pierpont 2018, the Byzantine Textform (the editors' accented CSV on
+    GitHub; eBible.org's copy has no accents), the Patriarchal text of 1904 and
+    the Textus Receptus (eBible.org USFM);
   - Hebrew, Old Testament only: the Masoretic text (Westminster Leningrad Codex,
     eBible.org `hbo`), its numbering folded into the KJV's by Paratext's `eng.vrs`;
     shown right to left.
-  The Hebrew and the Greek also go to the discussions' AI evaluator, which sees a
-  verse only in its original language (`server/src/originals.rs`).
+  The WLC and the SBLGNT, the oldest and fullest of each language, also fill the
+  server's table of originals: a verse added to a discussion carries its text from
+  there, which the AI evaluator reads instead of any translation and readers see
+  beside theirs (`server/src/originals.rs`).
   All but the Synodal are in KJV numbering: where an edition numbers otherwise
   (the Romans doxology of WEB, RP and PT, Ohienko's Psalm titles, the Patriarchal
   text's own verse divisions), the converter folds it in.

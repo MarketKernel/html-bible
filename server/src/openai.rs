@@ -138,17 +138,19 @@ const EVALUATION: &str = "You weigh one Bible verse in a discussion. A topic ask
 and B (the labels are shuffled: A is not always the first position). A subtopic narrows the question. Members explain \
 the verse in two columns, one for each position; you are given the whole topic and every interpretation of both columns, \
 each in the language its author wrote (Russian or English).\n\n\
-The verse is given only in its original language, on purpose, and never in a translation: Hebrew (the Masoretic text, \
-Westminster Leningrad Codex; *written (read) marks a ketiv and its qere) for the Old Testament, Greek for the New \
-(Robinson–Pierpont 2018, the Byzantine text; where the Patriarchal text of 1904 (PT) or the Textus Receptus (TR) \
-words the verse otherwise, their wording follows, and an empty text means the edition does not have the verse). The \
-three verses before and after it are given too. If no text is given, recall the original yourself.\n\n\
-What counts is the text of the verse itself, in the original: its words, their meaning in the language of the time, \
-their grammar and syntax, and the context around it. Read it without leaning on established traditions, confessional \
-readings, commentaries or familiar translations: a translation carries its translator's choices, and a tradition its \
+The verse is given only in its original language, on purpose, and never in a translation: for the Old Testament the \
+Hebrew Masoretic text of the Leningrad Codex (WLC; *written (read) marks a ketiv and its qere), for the New the Greek \
+of the SBL Greek New Testament, a critical text made from the oldest manuscripts ([ ] marks words of doubtful \
+originality, ⟦ ⟧ a passage its editors judge a later addition). An empty text means the edition does not have the \
+verse: the oldest witnesses lack it. The three verses before and after it are given too. This text is the server's \
+own; if none is given, recall the same editions yourself.\n\n\
+Judge by this text alone. What counts is the verse itself, in the original: its words, their meaning in the language \
+of the time, their grammar and syntax, and the context around it. Set aside established traditions, confessional \
+readings, commentaries and familiar translations: a translation carries its translator's choices, and a tradition its \
 own conclusions, so neither is evidence of what the text says. Where a member's argument rests on a translation's \
-wording or on an authority, check it against the original; where the original allows more than one reading, say so \
-rather than pick the customary one. Do not take a member's quotation as the text.\n\n\
+wording or on an authority, check it against the original and weigh only what the original bears out; where the \
+original allows more than one reading, say so rather than pick the customary one. Do not take a member's quotation \
+as the text.\n\n\
 Decide what the verse itself, read this way, supports in this subtopic: position A, position B, or neither (`none`: it \
 is not relevant here, or it is genuinely balanced). The interpretations are arguments to weigh, not votes: one sound \
 reading outweighs many weak ones; ignore rhetoric, insults and appeals to numbers or authority.\n\n\
@@ -163,7 +165,7 @@ fn original(text: &Text) -> Value {
 
 /// The user message of an evaluation: the whole topic and both columns, in the
 /// authors' own words; the positions as A and B; the verse by reference and,
-/// from the server's own files, in its original language only.
+/// from the server's own table, in its original language only.
 pub fn evaluation_request(input: &EvalInput) -> String {
     let own = |text: &Option<Text>| text.as_ref().map(original).unwrap_or(Value::Null);
     let column = |items: &[crate::llm::EvalInterpretation]| {
@@ -332,7 +334,7 @@ mod tests {
     #[test]
     fn an_evaluation_sees_the_whole_topic_in_the_authors_words_and_the_verse_in_the_original() {
         use crate::llm::{EvalArgument, EvalInterpretation, EvalPositions, EvalQuestion, EvalSides, EvalVerse};
-        use crate::originals::{EditionText, Original};
+        use crate::model::Original;
         let q = question();
         let input = EvalInput {
             question: EvalQuestion {
@@ -346,10 +348,12 @@ mod tests {
                 id: "V".into(),
                 range: RefRange { from: "JHN.1.1".into(), to: "JHN.1.1".into() },
                 original: Some(Original {
-                    lang: "grc",
-                    editions: vec![EditionText { edition: "RP", text: "Ἐν ἀρχῇ ἦν ὁ λόγος".into() }],
+                    lang: "grc".into(),
+                    edition: "SBLGNT".into(),
+                    text: "Ἐν ἀρχῇ ἦν ὁ λόγος".into(),
                     before: String::new(),
-                    after: "1:2 Οὗτος ἦν ἐν ἀρχῇ πρὸς τὸν θεόν.".into(),
+                    after: "1:2 οὗτος ἦν ἐν ἀρχῇ πρὸς τὸν θεόν.".into(),
+                    cut: false,
                 }),
             },
             interpretations: EvalSides {
@@ -365,9 +369,10 @@ mod tests {
         assert_eq!(message["interpretations"]["B"][0]["replyTo"], "T1");
         assert_eq!(message["verse"], "JHN.1.1");
         assert_eq!(message["original"]["lang"], "grc");
-        assert_eq!(message["original"]["editions"], json!([{ "edition": "RP", "text": "Ἐν ἀρχῇ ἦν ὁ λόγος" }]));
-        assert_eq!(message["original"]["after"], "1:2 Οὗτος ἦν ἐν ἀρχῇ πρὸς τὸν θεόν.");
-        assert!(EVALUATION.contains("only in its original language") && EVALUATION.contains("without leaning on established traditions"));
+        assert_eq!((message["original"]["edition"].as_str(), message["original"]["text"].as_str()), (Some("SBLGNT"), Some("Ἐν ἀρχῇ ἦν ὁ λόγος")));
+        assert_eq!(message["original"]["after"], "1:2 οὗτος ἦν ἐν ἀρχῇ πρὸς τὸν θεόν.");
+        assert!(message.get("original").and_then(|o| o.get("cut")).is_none());
+        assert!(EVALUATION.contains("only in its original language") && EVALUATION.contains("Judge by this text alone"));
     }
 
     #[test]
